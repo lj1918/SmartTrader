@@ -1,51 +1,70 @@
 #pragma once
+#include "stdafx.h"
+//#include "FxcmApiStruct.h"
+#include <string>
 using namespace std;
-class CSessionStatusListener : public IO2GSessionStatus
+
+//前置声明解决头文件相互包含的问题,这个又必须用头文件，搞不清楚，
+//#include "hxcmapi.h"
+//class HxcmApi;
+
+class SessionStatusListener : public IO2GSessionStatus
 {
+private:
+	long mRefCount;
+	/** Subsession identifier. */
+	std::string mSessionID;
+	/** Pin code. */
+	std::string mPin;
+	/** Error flag. */
+	bool mError;
+	/** Flag indicating that connection is set. */
+	bool mConnected;
+	/** Flag indicating that connection was ended. */
+	bool mDisconnected;
+	/** Session object. */
+	IO2GSession *mSession;
+	/** Event handle. */
+	HANDLE mSessionEvent;
+
+	
+
+public:
+	//
 	// 通过 IO2GSessionStatus 继承
 	virtual long addRef() override;
 	virtual long release() override;
 	virtual void onSessionStatusChanged(O2GSessionStatus status) override;
 	virtual void onLoginFailed(const char * error) override;
+
 	//
-private:
-	volatile bool mConnected;
-	volatile bool mDisconnected;
-	volatile bool mError;
-	string mSubSessionID;
-	string mPin;
-	IO2GSession *mSession;
-	IO2GSessionStatus::O2GSessionStatus mStatus;
-
-	long mRefCount;
-
-public:
-	CSessionStatusListener(IO2GSession *session, const char *subSessionID, const char *pin)
+	SessionStatusListener(IO2GSession *session,  const char *sessionID, const char *pin)
 	{
+		if (sessionID != 0)
+			mSessionID = sessionID;
+		else
+			mSessionID = "";
+		if (pin != 0)
+			mPin = pin;
+		else
+			mPin = "";
 		mSession = session;
 		mSession->addRef();
-		mSubSessionID = subSessionID;
-		mPin = pin;
-
+		reset();
+		mRefCount = 1;
+		mSessionEvent = CreateEvent(0, FALSE, FALSE, 0);
+	}
+	~SessionStatusListener()
+	{
+	}
+	void reset()
+	{
 		mConnected = false;
 		mDisconnected = false;
 		mError = false;
-		mStatus = IO2GSessionStatus::Disconnected;
-		mRefCount = 1;
-		//
-		mSessionEvent = CreateEvent(0, FALSE, FALSE, 0);
 	}
-	~CSessionStatusListener()
-	{
-		mSession->release();
-	}
-	/** Wait for connection or error. */
-	HANDLE mSessionEvent;
-	bool waitEvents()
-	{
-		return WaitForSingleObject(mSessionEvent, _TIMEOUT) == 0;
-	}
-
-
+	bool waitEvents();
+	bool isDisconnected() const;
+	bool isConnected() const;
 };
 

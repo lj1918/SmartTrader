@@ -105,12 +105,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../api/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\boost_1_68_0;D:\ForexConnectAPIx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../api/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\boost_1_68_0\stage\lib\;D:\ForexConnectAPIx64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,21 +141,25 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\boost_1_68_0;D:\ForexConnectAPIx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\boost_1_68_0\stage\lib\;D:\ForexConnectAPIx64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ResponseListener.h" />
     <ClInclude Include="SessionStatusListener.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fxcmApiTest.cpp" />
+    <ClCompile Include="ResponseListener.cpp" />
     <ClCompile Include="SessionStatusListener.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -165,22 +169,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\api\bin\concrt140.dll" />
-    <None Include="..\api\bin\ForexConnect.dll" />
-    <None Include="..\api\bin\fxmsg.dll" />
-    <None Include="..\api\bin\fxtp.dll" />
-    <None Include="..\api\bin\gsexpat.dll" />
-    <None Include="..\api\bin\gstool3.dll" />
-    <None Include="..\api\bin\gszlib.dll" />
-    <None Include="..\api\bin\httplib.dll" />
-    <None Include="..\api\bin\log4cplus.dll" />
-    <None Include="..\api\bin\msvcp140.dll" />
-    <None Include="..\api\bin\pdas.dll" />
-    <None Include="..\api\bin\vccorlib140.dll" />
-    <None Include="..\api\bin\vcruntime140.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\api\lib\ForexConnect.lib" />
+    <Library Include="..\..\..\..\ForexConnectAPIx64\lib\ForexConnect.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

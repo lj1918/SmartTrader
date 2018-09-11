@@ -36,7 +36,7 @@ if __name__ == '__main__':
     api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo")
     api.Login(True)
     # api.qryHisPrices('EUR/USD','H1',300,'2018-08-16 01:00:00 ','2018-08-16 04:01:00')
-    # api.qryHisPrices('EUR/USD', 'm1', 1, '2018-09-05 23:01:17', '2018-09-06 23:01:17')
+    # api.qryHisPrices('EUR/USD', 'm1', 1, '2018-09-05 23:01:17', '2018-09-12 23:01:17')
     api.StartTick("m1")
     print("test test test test ")
     # api.StartTick("m1")

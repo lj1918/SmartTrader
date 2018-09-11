@@ -1,105 +1,95 @@
 #include "stdafx.h"
 #include "SessionStatusListener.h"
+using namespace std;
 
-/** Constructor. */
 
-
-long CSessionStatusListener::addRef()
+long SessionStatusListener::addRef()
 {
 	return InterlockedIncrement(&mRefCount);
-
 }
 
-long CSessionStatusListener::release()
+long SessionStatusListener::release()
 {
 	long rc = InterlockedDecrement(&mRefCount);
 	if (rc == 0)
 		delete this;
 	return rc;
-
 }
 
-void CSessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
+void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 {
-	mStatus = status;
-	switch (mStatus)
+	std::cout <<"status = " << status << std::endl;
+	switch (status)
 	{
-	case    IO2GSessionStatus::Disconnected:
-	{
-		std::cout << "Status::disconnected" << std::endl;
+	case IO2GSessionStatus::Disconnected:
+		std::cout << "status = IO2GSessionStatus::Disconnected " << status << std::endl;
 		mConnected = false;
 		mDisconnected = true;
+
+		//发信号，停止等待
 		SetEvent(mSessionEvent);
 		break;
-	}
-
-	case    IO2GSessionStatus::Connecting:
-		std::cout << "Status::connecting" << std::endl;
+	case IO2GSessionStatus::Connecting:
 		break;
-	case    IO2GSessionStatus::TradingSessionRequested:
-		std::cout << "Status::trading session requested" << std::endl;
-		break;
-	case    IO2GSessionStatus::Connected:
+	case IO2GSessionStatus::TradingSessionRequested:
 	{
-		std::cout << "Status::connected" << std::endl; 
-		DATE serverDate = mSession->getServerTime();
-		std::cout << "serverDate = " << serverDate << std::endl;
-		O2GUserKind userKind = mSession->getUserKind();
-		std::cout << "userKind = " << userKind;
-		IO2GSessionDescriptorCollection * descriptors = mSession->getTradingSessionDescriptors();
+		O2G2Ptr<IO2GSessionDescriptorCollection> descriptors = mSession->getTradingSessionDescriptors();
+		bool found = false;
+		if (descriptors)
+		{
+			for (int i = 0; i < descriptors->size(); ++i)
+			{
+				O2G2Ptr<IO2GSessionDescriptor> descriptor = descriptors->get(i);
+				if (mSessionID == descriptor->getID())
+				{
+					found = true;
+					break;
+				}
+			}
+		}
+		if (!found)
+		{
+			onLoginFailed("The specified sub session identifier is not found");
+		}
+		else
+		{
+			mSession->setTradingSession(mSessionID.c_str(), mPin.c_str());
+		}
+	}
+	break;
+	case IO2GSessionStatus::Connected:
+		std::cout << "IO2GSessionStatus::Connected" << status << std::endl;
+		//发信号，停止等待
+		//api->sendMessage("Login successed!!!");
 		mConnected = true;
 		mDisconnected = false;
 		SetEvent(mSessionEvent);
 		break;
-	}
-	case    IO2GSessionStatus::Reconnecting:
-		std::cout << "Status::reconnecting" << std::endl;
+	case IO2GSessionStatus::Reconnecting:
 		break;
-	case    IO2GSessionStatus::Disconnecting:
-		std::cout << "Status::disconnecting" << std::endl;
+	case IO2GSessionStatus::Disconnecting:
 		break;
-	case    IO2GSessionStatus::SessionLost:
-		std::cout << "Status::session lost" << std::endl;
+	case IO2GSessionStatus::SessionLost:
 		break;
 	}
-
-	if (mStatus == IO2GSessionStatus::TradingSessionRequested)
-	{
-		IO2GSessionDescriptorCollection *descriptors = mSession->getTradingSessionDescriptors();
-		bool found = false;
-		if (descriptors)
-		{
-			std::cout << "Available descriptors:" << std::endl;
-			for (int i = 0; i < descriptors->size(); i++)
-			{
-				IO2GSessionDescriptor *descriptor = descriptors->get(i);
-				string temp = "";
-				if (descriptor->requiresPin()  == true)
-					temp = "requires pin";
-				else
-					temp = "not requires pin";
-				std::cout << "  id='" << descriptor->getID() << "' " <<
-					"name='" << descriptor->getName() << "' " <<
-					"description='" << descriptor->getDescription() << "' " << temp  << std::endl;
-
-				if (mSubSessionID == descriptor->getID())
-					found = true;
-
-				descriptor->release();
-			}
-			descriptors->release();
-		}
-		if (!found)
-			onLoginFailed("The specified sub session identifier is not found");
-		else
-			mSession->setTradingSession(mSubSessionID.c_str(), mPin.c_str());
-	}
-
 }
 
-void CSessionStatusListener::onLoginFailed(const char * error)
+void SessionStatusListener::onLoginFailed(const char * error)
 {
-	std::cout << "Login error: " << error << std::endl;
 	mError = true;
-
+	std::cout << error << std::endl;
+}
+/** Wait for connection or error. */
+bool SessionStatusListener::waitEvents()
+{
+	return WaitForSingleObject(mSessionEvent, _TIMEOUT) == 0;
+}
+/** Check whether session is disconnected */
+bool SessionStatusListener::isDisconnected() const
+{
+	return mDisconnected;
+}
+bool SessionStatusListener::isConnected() const
+{
+	return mConnected;
 }

@@ -124,3 +124,5 @@ venv.bak/
 /SmartTraderFrameWork/api/ctp/*.pdb
 /SmartTraderFrameWork/api/ctp/vnctptd/vnctptd/*.dtd
 >>>>>>> 4fc163e41ac7ef036a2727ef1ff8477578970bca
+*.exe
+*.pdb

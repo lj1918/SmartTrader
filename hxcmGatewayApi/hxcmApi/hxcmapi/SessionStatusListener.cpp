@@ -18,7 +18,7 @@ long SessionStatusListener::release()
 
 void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 {
-	//std::cout <<"status = " << status << std::endl;
+	std::cout <<"status = " << status << std::endl;
 	switch (status)
 	{
 	case IO2GSessionStatus::Disconnected:
@@ -26,7 +26,7 @@ void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 		mConnected = false;
 		mDisconnected = true;
 		//重新链接,以后在实现
-		this->api->Login(true);
+		//this->mSession->login();
 		//发信号，停止等待
 		SetEvent(mSessionEvent);
 		break;
@@ -61,7 +61,6 @@ void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 	case IO2GSessionStatus::Connected:
 		std::cout << "IO2GSessionStatus::Connected" << status << std::endl;
 		//发信号，停止等待
-		//api->sendMessage("Login successed!!!");
 		mConnected = true;
 		mDisconnected = false;
 		SetEvent(mSessionEvent);
