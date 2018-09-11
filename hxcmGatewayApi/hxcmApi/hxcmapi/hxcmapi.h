@@ -196,6 +196,8 @@ public:
 	//定时查询最新的历史数据
 	void qryTickData(string timeFrame);
 	void qryTickData();
+	//注册Tick数据
+	void regTick(dict ticks);
 
 	//处理分发来的tick任务
 	void processTick(Task task);

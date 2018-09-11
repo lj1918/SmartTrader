@@ -47,28 +47,24 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 	bool needquestAgain = false;
 
 	//如果是查询历史价格的响应信息,可以列出货币对订阅的情况，货币对实时交易信息在onTablesUpdates事件中处理
-	//std::cout << "onRequestCompleted " << response->getType()  << "  "<<__LINE__ << std::endl;
 	if (response && response->getType() == MarketDataSnapshot)
 	{
 		//获取该响应对应请求的相关信息：账户、密码等
 		sFxcmRequestHisPrices reqData = mRequestDataSet[string(requestId)];
-		//std::cout << reqData.instrument<< " " << reqData.beginDate << " " <<reqData.endDate << " " <<reqData.maxBars  << "l ine no =" << __LINE__ << std::endl;
+
 		// 10. 获取 IO2GResponseReaderFactory:
 		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = mSession->getResponseReaderFactory();
 		
 		if (readerFactory)
 		{			
-			//std::cout << "if (readerFactory) " << __LINE__ << std::endl;
 			// 11. 创建 IO2GMarketDataSnapshotResponseReader:
 			O2G2Ptr<IO2GMarketDataSnapshotResponseReader> reader = readerFactory->createMarketDataSnapshotReader(response);
-			//std::cout << "reader =  " << reader  << " "<< __LINE__ << std::endl;
 			if (reader)
 			{
 
 			}
 			if ( reader->size() > 0)
 			{
-				//std::cout << "  ( reader->size() > 0) " << __LINE__ << std::endl;
 				//已收到数据更新
 				mRequestDataSet[requestId].getNums += reader->size();
 				
@@ -80,17 +76,16 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 						% reader->size() 
 						% mRequestDataSet[requestId].getNums; //"查询历史价格："
 					std::string message = fmessage.str();
-					//std::cout << message << __LINE__ << std::endl;
-					//this->api->sendMessage(message);
+					this->api->sendMessage(message);
 				}
 				catch (const std::exception&ee)
 				{
 					std::cout << ee.what() << __LINE__ << std::endl;					
 				}
 				// 构造Task,发送数据给python终端
-				//std::cout << "  begin send task " << __LINE__ << std::endl;
 				Task task = Task();
 				task.task_name = OnGetHisPrices_smart;
+				task.instrument = mRequestDataSet[requestId].instrument;
 				task.task_data = reader;
 				//将response返回到api，在那里对数据进行遍历，并构造dict数据
 				//不能在这里构造boost::python下的数据类型，会出错

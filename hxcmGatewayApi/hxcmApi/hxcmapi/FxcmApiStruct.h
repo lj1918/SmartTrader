@@ -50,6 +50,7 @@ struct Task
 	//Task() {};
 	//Task(const char* msg) :task_message(msg) {};
 	int task_name;		//回调函数名称对应的常量
+	string instrument;	//货币对名称
 	any task_data;		//数据结构体
 	any task_error;		//错误结构体
 	int task_id;		//请求id
