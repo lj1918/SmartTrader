@@ -38,16 +38,8 @@ public:
 	virtual void onLoginFailed(const char * error) override;
 
 	//
-	SessionStatusListener(IO2GSession *session,  const char *sessionID, const char *pin)
+	SessionStatusListener(IO2GSession *session)
 	{
-		if (sessionID != 0)
-			mSessionID = sessionID;
-		else
-			mSessionID = "";
-		if (pin != 0)
-			mPin = pin;
-		else
-			mPin = "";
 		mSession = session;
 		mSession->addRef();
 		reset();

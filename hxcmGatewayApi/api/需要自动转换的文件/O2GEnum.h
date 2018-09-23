@@ -2,7 +2,7 @@
 
 typedef enum
 {
-    TableUnknown = - 1,
+    TableUnknown = -1,
     Offers = 0,
     Accounts = 1,
     Orders = 2,
@@ -34,7 +34,7 @@ typedef enum
 
 typedef enum
 {
-    UpdateUnknown = - 1,
+    UpdateUnknown = -1,
     Insert = 0,
     Update = 1,
     Delete = 2
@@ -111,8 +111,7 @@ typedef enum
     NoChartSession = 0,
     Attached = 1,
     Detached = 2
-}
-O2GChartSessionMode;
+} O2GChartSessionMode;
 
 typedef enum       
 {
@@ -156,8 +155,7 @@ typedef enum
     OpenCommission = 0,
     CloseCommission = 1,
     AnyDealCommission = 2
-}
-O2GCommissionStage;
+} O2GCommissionStage;
 
 typedef enum 
 {
@@ -168,7 +166,7 @@ typedef enum
     CommissionPerOrder = 3,
     CommissionPerOrderConv = 4,
     CommissionPerBasisPoints = 5,        
-}O2GCommissionUnitType;
+} O2GCommissionUnitType;
 
 typedef enum
 {
@@ -176,7 +174,7 @@ typedef enum
     CommissionStatusLoading = 1,
     CommissionStatusReady = 2,
     CommissionStatusFailToLoad = 3
-}O2GCommissionStatus;
+} O2GCommissionStatus;
 
 typedef enum
 {
@@ -185,14 +183,12 @@ typedef enum
     Customer = 22,
     Dealer = 24,
     Admin = 26
-}
-O2GUserKind;
+} O2GUserKind;
 
 typedef enum
 {
-    RolloverNotLoaded,
-    RolloverLoading,
-    RolloverReady,
-    FailToLoad
-}
-O2GRolloverStatus;
+    RolloverNotLoaded = 0,
+    RolloverLoading = 1,
+    RolloverReady = 2,
+    FailToLoad = 3
+} O2GRolloverStatus;

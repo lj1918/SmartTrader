@@ -58,9 +58,6 @@ void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 	}
 	break;
 	case IO2GSessionStatus::Connected:
-		std::cout << "IO2GSessionStatus::Connected" << status << std::endl;
-		//·¢ÐÅºÅ£¬Í£Ö¹µÈ´ý
-		//api->sendMessage("Login successed!!!");
 		mConnected = true;
 		mDisconnected = false;
 		SetEvent(mSessionEvent);
