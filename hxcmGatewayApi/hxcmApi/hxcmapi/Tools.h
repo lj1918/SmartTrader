@@ -31,6 +31,14 @@ public:
 	static DATE ConvertLocal2UTC(IO2GSession *pSession, DATE s);
 	//将UTC时间转换为本地时间
 	static DATE ConvertUTC2Local(IO2GSession *pSession, DATE s);
+	// 获取账户
+	static IO2GAccountRow * GetAccount(IO2GSession *session, string sAccountID);
+	// 获取货币对对象
+	static IO2GOfferRow * GetOffer(IO2GSession *session, string sInstrument);
+	// 将O2GResponseType转换为字符串
+	static string GetResponseType(O2GResponseType type);
+	//
+	static string OfferID2OfferName(IO2GSession *session,string offerid);
 
 };
 

@@ -42,12 +42,13 @@ long ResponseListener::release()
 /** Request execution completed data handler. 回调函数*/
 void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse * response = 0)
 {
+	PRINTLINE("response->getType() = " + Tools::GetResponseType(response->getType())  );
 	//std::cout << "requestId = " << requestId << std::endl;
 	//是否还有再次查询
 	bool needquestAgain = false;
 
 	//如果是查询历史价格的响应信息,可以列出货币对订阅的情况，货币对实时交易信息在onTablesUpdates事件中处理
-	if (response && response->getType() == MarketDataSnapshot)
+	if (response && response->getType() == O2GResponseType::MarketDataSnapshot)
 	{
 		//获取该响应对应请求的相关信息：账户、密码等
 		sFxcmRequestHisPrices reqData = mRequestDataSet[string(requestId)];
@@ -160,8 +161,9 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 		return;
 	}
 	// command request的响应
-	if (response && response->getType() == Command)
+	if (response && response->getType() == O2GResponseType::GetOffers)  ///CommandResponse  
 	{
+		PRINTLINE("response && response->getType() == GetOffers");
 		//打印offer 信息
 		IO2GOfferRow *resultOffer = NULL;
 		O2G2Ptr<IO2GLoginRules> loginRules = mSession->getLoginRules();
@@ -197,6 +199,43 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 		}
 		return;
 	}
+
+	// 查询position请求的响应
+	if (response && response->getType() == O2GResponseType::GetTrades)
+	{
+		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = mSession->getResponseReaderFactory();
+		if (readerFactory)
+		{
+			O2G2Ptr<IO2GTradesTableResponseReader> reader = readerFactory->createTradesTableReader(response);
+			for (int i = 0; i < reader->size(); i++)
+			{
+				O2G2Ptr<IO2GTradeRow> trade = reader->getRow(i);
+				string opentime = "";
+				Tools::formatDate( trade->getOpenTime(), opentime);
+
+				std::cout << " This is a response to your request: \nTradeID = " << trade->getTradeID() <<
+					" OfferID = " << trade->getOfferID() <<
+					" OfferInstrument = " << Tools::OfferID2OfferName(this->mSession, trade->getOfferID()) <<
+					" AccountName = " << trade->getAccountName() <<
+					" OpenOrderID  = " << trade->getOpenOrderID() <<
+					" OpenOrderReqID = " << trade->getOpenOrderReqID() <<
+					" getOpenOrderRequestTXT = " << trade->getOpenOrderRequestTXT() <<
+					" getOpenQuoteID = " << trade->getOpenQuoteID() <<
+					" TradeIDOrigin = " << trade->getTradeIDOrigin() <<
+					" Commission = " << trade->getCommission() <<
+					" UsedMargin = " << trade->getUsedMargin() <<
+					" OpenRate = " << trade->getOpenRate() << 
+					" OpenTime = " << opentime <<
+					" OpenTime = " << trade->getOpenTime() <<
+					" ValueDate = " << trade->getValueDate() <<
+					" Parties = " << trade->getParties() <<
+					" BuySell = " << trade->getBuySell() <<
+					" Amount = " << trade->getAmount() << std::endl;
+			}
+		}
+		//mRequestComplete = true;
+
+	}
 }
 
 void ResponseListener::onRequestFailed(const char * requestId, const char * error)
@@ -211,6 +250,7 @@ void ResponseListener::onRequestFailed(const char * requestId, const char * erro
 // 
 void ResponseListener::onTablesUpdates(IO2GResponse * data)
 {
+	
 	//货币对实时报价的订阅消息处理
 	if (data->getType() == TablesUpdates)
 	{

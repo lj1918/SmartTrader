@@ -114,3 +114,183 @@ void Tools::formatDate(DATE d, std::string &buf)
 		 }
 	 }
  };
+
+ IO2GAccountRow *  Tools::GetAccount(IO2GSession *session, string sAccountID)
+ {
+	 O2G2Ptr<IO2GLoginRules> loginRules = session->getLoginRules();
+	 if (loginRules)
+	 {
+		 O2G2Ptr<IO2GResponse> response = loginRules->getTableRefreshResponse(Accounts);
+		 if (response)
+		 {
+			 O2G2Ptr<IO2GResponseReaderFactory> readerFactory = session->getResponseReaderFactory();
+			 if (readerFactory)
+			 {
+				 O2G2Ptr<IO2GAccountsTableResponseReader> reader = readerFactory->createAccountsTableReader(response);
+
+				 for (int i = 0; i < reader->size(); ++i)
+				 {
+					 O2G2Ptr<IO2GAccountRow> account = reader->getRow(i);
+					 if (account)
+						 if (sAccountID  != "" || account->getAccountID() == sAccountID )
+							 if (account->getMarginCallFlag() == "N"
+								 && (account->getAccountKind() == "32" || account->getAccountKind() == "36"))
+							 {
+								 return account.Detach();
+							 }
+								 
+				 }
+			 }
+		 }
+	 }
+	 return NULL;
+ }
+
+ IO2GOfferRow * Tools::GetOffer(IO2GSession *session, string sInstrument)
+ {
+	 if (!session || sInstrument == "")
+		 return NULL;
+
+	 IO2GOfferRow *resultOffer = NULL;
+	 O2G2Ptr<IO2GLoginRules> loginRules = session->getLoginRules();
+	 if (loginRules)
+	 {
+		 O2G2Ptr<IO2GResponse> response = loginRules->getTableRefreshResponse(Offers);
+		 if (response)
+		 {
+			 O2G2Ptr<IO2GResponseReaderFactory> readerFactory = session->getResponseReaderFactory();
+			 if (readerFactory)
+			 {
+				 O2G2Ptr<IO2GOffersTableResponseReader> reader = readerFactory->createOffersTableReader(response);
+				 for (int i = 0; i < reader->size(); ++i)
+				 {
+					 O2G2Ptr<IO2GOfferRow> offer = reader->getRow(i);
+					 if (offer)
+					 {
+						 // 输出货币对的订阅状态
+						 if ( offer->getInstrument() == sInstrument )
+						 {
+							 resultOffer = offer.Detach();
+						 }
+
+					 }
+				 }
+			 }
+		 }
+	 }
+	 return resultOffer;
+ }
+
+ string Tools::GetResponseType(O2GResponseType type)
+ {
+	 string result = "unknow";
+	 switch (type)
+	 {
+	 case O2GResponseType::CommandResponse:
+	 {
+		 result = "CommandResponse";
+		 break;
+	 }
+	 case O2GResponseType::CreateOrderResponse:
+	 {
+		 result = "CreateOrderResponse";
+		 break;
+	 }
+	 case O2GResponseType::GetAccounts:
+	 {
+		 result = "GetAccounts";
+		 break;
+	 }
+		
+	 case O2GResponseType::GetClosedTrades:
+	 {
+		 result = "GetClosedTrades";
+		 break;
+	 }
+	 case O2GResponseType::GetLastOrderUpdate:
+	 {
+		 result = "GetLastOrderUpdate";
+		 break;
+	 }
+	 case O2GResponseType::GetMessages:
+	 {
+		 result = "GetMessages";
+		 break;
+	 }
+	 case O2GResponseType::GetOffers:
+	 {
+		 result = "GetOffers";
+		 break;
+	 }
+	 case O2GResponseType::GetSystemProperties:
+	 {
+		 result = "GetSystemProperties";
+		 break;
+	 }
+	 case O2GResponseType::GetTrades:
+	 {
+		 result = "GetTrades";
+		 break;
+	 }
+	 case O2GResponseType::MarginRequirementsResponse:
+	 {
+		 result = "MarginRequirementsResponse ";
+		 break;
+	 }
+	 case O2GResponseType::MarketDataSnapshot:
+	 {
+		 result = "MarketDataSnapshot  ";
+		 break;
+	 }
+	 case O2GResponseType::TablesUpdates:
+	 {
+		 result = "TablesUpdates   ";
+		 break;
+	 }
+	 case O2GResponseType::ResponseUnknown:
+	 {
+		 result = "ResponseUnknown    ";
+		 break;
+	 }
+	 default:
+		 break;
+	 }
+	 return result;
+ }
+
+ string Tools::OfferID2OfferName(IO2GSession *session,string offerid)
+ {
+	 string result = "";
+	 if (!session )
+		 return result;
+
+	 IO2GOfferRow *resultOffer = NULL;
+	 O2G2Ptr<IO2GLoginRules> loginRules = session->getLoginRules();
+	 if (loginRules)
+	 {
+		 O2G2Ptr<IO2GResponse> response = loginRules->getTableRefreshResponse(Offers);
+		 if (response)
+		 {
+			 O2G2Ptr<IO2GResponseReaderFactory> readerFactory = session->getResponseReaderFactory();
+			 if (readerFactory)
+			 {
+				 O2G2Ptr<IO2GOffersTableResponseReader> reader = readerFactory->createOffersTableReader(response);
+				 for (int i = 0; i < reader->size(); ++i)
+				 {
+					 O2G2Ptr<IO2GOfferRow> offer = reader->getRow(i);
+					 if (offer)
+					 {
+						 // 输出货币对的订阅状态
+						 if (offer->getOfferID() == offerid)
+						 {
+							 result = offer->getInstrument();
+							 return result;
+						 }
+
+					 }
+				 }
+			 }
+		 }
+	 }
+	 return result;
+ }

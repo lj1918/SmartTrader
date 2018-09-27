@@ -96,7 +96,7 @@ private:
 	//=========================================================================
 	//调试用函数
 	//=========================================================================
-	IO2GOfferRow *getOfferAndPrint(IO2GSession *session, const char *sInstrument, bool IsPrint=false);
+	void PrintOfferSubscribeStatus(IO2GSession *session, const char *sInstrument, bool IsPrint=false);
 	//用于保存:查询Tick信息的RequestId
 	const char * tickRequestId;
 protected:
@@ -117,6 +117,8 @@ protected:
 	string  PWD;		//
 	string  URL;		//"http://www.fxcorporate.com/Hosts.jsp"
 	string  CONN;		// "Demo" or "Real".
+	//账户ID
+	string AccountID;
 
 	void printPrices(IO2GSession *session, IO2GResponse *response);
 	// 4. onTick事件的线程
@@ -129,7 +131,7 @@ protected:
 
 public:
 	HxcmApi();
-	HxcmApi(string  userName, string   pwd, string  url, string connection);
+	HxcmApi(string  userName, string   pwd, string  url, string connection,string accounntid);
 
 	//析构函数
 	~HxcmApi() {};
@@ -209,9 +211,9 @@ public:
 	// 查询类函数，提供查询账户、查询仓位等函数
 	//==================================================================================
 	// 账户查询函数
-	dict qryAccount();
+	dict qryAccount(string accountId);
 	//
-	void qryAccounts();
+	void qryPosition(string instrument);
 
 	//==================================================================================
 	// 创建一个Open Order，即指定价格的订单

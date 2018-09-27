@@ -11,8 +11,8 @@ if __name__ == '__main__':
     msgDict[LoginSuccessed] = "Login Successed"
     class test(HxcmApi):
         filename = 'd:\\record.csv'
-        def __init__(self,username,pwd,url,conn):
-            super(test, self).__init__(username,pwd,url,conn)
+        def __init__(self,username,pwd,url,conn,accountid):
+            super(test, self).__init__(username,pwd,url,conn,accountid)
             pass
         def onResGetHistoryPrices(self, data, isLast):
             # print(data['nums'])
@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
         def onSubscribeInstrument(self,data):
         #     #print("call onSubscribeInstrument")
-            print(data)
+        #     print(data)
             pass
         def onMessage(self,data):
             # print(type(data))
@@ -33,11 +33,12 @@ if __name__ == '__main__':
             # msgDict[data['data']]
             pass
 
-    api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo")
+    api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo","1117090")
     api.Login(True)
-    result = api.qryAccount()
+    result = api.qryAccount("1117090")
     print(result)
     # print(result['bb'])
+    api.qryPosition("EUR/USD")
     # aa = {'m5': ['EUR/USD', 'USD/JPY']}
     # api.regTick(aa)
     # api.qryHisPrices('EUR/USD','H1',300,'2018-08-16 01:00:00 ','2018-08-16 04:01:00')
@@ -48,7 +49,7 @@ if __name__ == '__main__':
     # print("www www www www ")
     # api.qryLastHisPrice('EUR/USD', 'H1')
     # print(dir(api))
-    # api.Subscribe('EUR/USD','D',True)
+    # api.Subscribe('EUR/USD','V',False)
     i = 1
     beginTime = datetime.now()
     #=====================

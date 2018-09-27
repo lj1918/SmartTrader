@@ -3,15 +3,16 @@
 class Account
 {
 private:
-	Account(IO2GSession *session);
+	Account(IO2GSession *session,std::string accountid);
 	static IO2GSession *session;
 	static Account * instance;
+	static std::string accountID;
 protected:
 	
 public:	
 
 	~Account();
-	static Account * Instance(IO2GSession *session);
+	static Account * Instance(IO2GSession *session,std::string accountID);
 
 	bool update();
 
