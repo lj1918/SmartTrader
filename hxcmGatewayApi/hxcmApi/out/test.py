@@ -40,6 +40,8 @@ if __name__ == '__main__':
     api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo","1117090")
     api.Login(True)
     result = api.qryAccount("1117090")
+    # print(result)
+    result = api.qryInstrumentInfo()
     print(result)
     # print(result['bb'])
     api.qryPosition("EUR/USD")

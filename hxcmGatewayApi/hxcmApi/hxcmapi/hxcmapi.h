@@ -218,6 +218,9 @@ public:
 	void processqryPosition(Task task);
 	virtual void onQryPosition(boost::python::list data) {};
 
+	// 查询货币对的基本信息
+	boost::python::list qryInstrumentInfo();
+
 	//==================================================================================
 	// 创建一个Open Order，即指定价格的订单
 	//==================================================================================

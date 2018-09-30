@@ -3,3 +3,4 @@
 2、完成position查询的函数，qryPosition
 
 3、完成getTradingSettingsProvider相关的接口包装
+   对所有货币对的最小交易手数、保证金要求等待
