@@ -10,14 +10,15 @@ using namespace boost;
 // 常量
 #define		OnGetHisPrices_smart			1  //获取历史数据标记
 #define		OnGetSubScribeData_smart		2 //获取订阅的货币对（instrument）的市场报价（offer）
-#define		OnMessage_smart				3 //返回给客户端的信息，包括出错信息
+#define		OnMessage_smart					3 //返回给客户端的信息，包括出错信息
+#define     OnQryPosition_smart				4 //查询货币对的仓位信息
 
 struct SFxcmLoginField
 {
 	// 账号
 };
 //历史数据的Request参数
-struct sFxcmRequestHisPrices
+struct sFxcmRequestData
 {
 	string instrument;
 	string stimeFrame;
@@ -25,6 +26,7 @@ struct sFxcmRequestHisPrices
 	double beginDate;
 	double endDate;
 	int getNums;
+	int requestType;
 };
 
 struct SFxcmHisPrice

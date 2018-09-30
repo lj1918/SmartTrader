@@ -16,7 +16,7 @@ if __name__ == '__main__':
             pass
         def onResGetHistoryPrices(self, data, isLast):
             # print(data['nums'])
-            print(data['data'])
+            # print(data['data'])
             # a = pd.DataFrame(data['data'])
             # a.to_csv('d:\\log.csv',mode='a',header=False)
             pass
@@ -32,6 +32,10 @@ if __name__ == '__main__':
             # print(data['data'])
             # msgDict[data['data']]
             pass
+        def onQryPosition(self,data):
+            print("*"*45)
+            print(data)
+            pass
 
     api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo","1117090")
     api.Login(True)
@@ -41,7 +45,7 @@ if __name__ == '__main__':
     api.qryPosition("EUR/USD")
     # aa = {'m5': ['EUR/USD', 'USD/JPY']}
     # api.regTick(aa)
-    # api.qryHisPrices('EUR/USD','H1',300,'2018-08-16 01:00:00 ','2018-08-16 04:01:00')
+    api.qryHisPrices('EUR/USD','m1',300,'2018-08-16 01:00:00 ','2018-08-16 04:01:00')
     # api.qryHisPrices('EUR/USD', 'm1', 1, '2018-09-05 23:01:17', '2018-09-12 23:01:17')
     # api.StartTick("m1")
     # print("test test test test ")

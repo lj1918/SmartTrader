@@ -1,3 +1,5 @@
 1、2018.09.24  完成qryAccount主动函数，去除了qryAccounts函数
 
 2、完成position查询的函数，qryPosition
+
+3、完成getTradingSettingsProvider相关的接口包装

@@ -214,6 +214,9 @@ public:
 	dict qryAccount(string accountId);
 	//
 	void qryPosition(string instrument);
+	//订阅货币对信息任务的处理函数
+	void processqryPosition(Task task);
+	virtual void onQryPosition(boost::python::list data) {};
 
 	//==================================================================================
 	// 创建一个Open Order，即指定价格的订单

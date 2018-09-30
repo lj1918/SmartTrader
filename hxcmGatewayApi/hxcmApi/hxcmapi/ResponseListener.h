@@ -34,9 +34,7 @@ protected:
 	virtual ~ResponseListener();
 public:
 	//数据
-	map<string, sFxcmRequestHisPrices> mRequestDataSet;
-	// 用于保存Command类别的requestID
-	map<string, int> mRequestResponseType;
+	map<string, sFxcmRequestData> mRequestDataSet;
 
 	//方法
 	ResponseListener(IO2GSession *session, HxcmApi * api/**/);

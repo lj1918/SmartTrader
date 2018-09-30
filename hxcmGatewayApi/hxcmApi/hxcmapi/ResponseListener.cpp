@@ -51,7 +51,7 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 	if (response && response->getType() == O2GResponseType::MarketDataSnapshot)
 	{
 		//获取该响应对应请求的相关信息：账户、密码等
-		sFxcmRequestHisPrices reqData = mRequestDataSet[string(requestId)];
+		sFxcmRequestData reqData = mRequestDataSet[string(requestId)];
 
 		// 10. 获取 IO2GResponseReaderFactory:
 		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = mSession->getResponseReaderFactory();
@@ -123,7 +123,7 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 							mRequestDataSet[requestId].endDate, false);	// to时间
 
 						//保存本次查询的相关信息	
-						sFxcmRequestHisPrices reqData;
+						sFxcmRequestData reqData;
 						reqData.instrument = mRequestDataSet[requestId].instrument;
 						reqData.stimeFrame = mRequestDataSet[requestId].stimeFrame;
 						reqData.beginDate = mRequestDataSet[requestId].beginDate;
@@ -207,6 +207,7 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 		if (readerFactory)
 		{
 			O2G2Ptr<IO2GTradesTableResponseReader> reader = readerFactory->createTradesTableReader(response);
+			/*
 			for (int i = 0; i < reader->size(); i++)
 			{
 				O2G2Ptr<IO2GTradeRow> trade = reader->getRow(i);
@@ -232,6 +233,22 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 					" BuySell = " << trade->getBuySell() <<
 					" Amount = " << trade->getAmount() << std::endl;
 			}
+			*/
+			// 构造Task,发送数据给python终端
+			Task task = Task();
+			task.task_name = OnQryPosition_smart;
+			if (mRequestDataSet[requestId].requestType == O2GResponseType::GetTrades)
+			{
+				task.instrument = mRequestDataSet[requestId].instrument;
+			}
+			else
+			{
+				task.instrument = "Error Instrument";
+			}
+			
+			task.task_data = reader;
+			//插入task队列
+			this->api->putTask(task);
 		}
 		//mRequestComplete = true;
 
