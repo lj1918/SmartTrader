@@ -62,101 +62,100 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 			O2G2Ptr<IO2GMarketDataSnapshotResponseReader> reader = readerFactory->createMarketDataSnapshotReader(response);
 			if (reader)
 			{
+				if (reader->size() > 0)
+				{
+					//已收到数据更新
+					mRequestDataSet[requestId].getNums += reader->size();
 
-			}
-			if ( reader->size() > 0)
-			{
-				//已收到数据更新
-				mRequestDataSet[requestId].getNums += reader->size();
-				
-				//构造通知消息
-				try
-				{
-					boost::format fmessage = boost::format("This time [%s]  received : %s records, total got %s records")
-						% mRequestDataSet[requestId].instrument 
-						% reader->size() 
-						% mRequestDataSet[requestId].getNums; //"查询历史价格："
-					std::string message = fmessage.str();
-					this->api->sendMessage(message);
-				}
-				catch (const std::exception&ee)
-				{
-					std::cout << ee.what() << __LINE__ << std::endl;					
-				}
-				// 构造Task,发送数据给python终端
-				Task task = Task();
-				task.task_name = OnGetHisPrices_smart;
-				task.instrument = mRequestDataSet[requestId].instrument;
-				task.task_data = reader;
-				//将response返回到api，在那里对数据进行遍历，并构造dict数据
-				//不能在这里构造boost::python下的数据类型，会出错
-				this->api->putTask(task);
-				//std::cout << "  end send task " << __LINE__ << std::endl;
-				//判断是否返回了所有历史数据，如果endDate为节假日，可能会有问题
-				if (fabs(mRequestDataSet[requestId].endDate - reader->getDate(0)) > 0.0001 //返回数据中最新记录的日期是否等于endDate
-					/*|| mRequestDataSet[requestId].maxBars > mRequestDataSet[requestId].getNums*/ //maxBarsw为单次返回的历史数据的最大笔数
-					)
-				{
-					mRequestDataSet[requestId].endDate = reader->getDate(0); // 返回数据的最新的时间
-					needquestAgain = true;
-
-					// 继续查询历史数据
-					if (needquestAgain)
+					//构造通知消息
+					try
 					{
-						//填充request
-						O2G2Ptr<IO2GRequestFactory> factory = mSession->getRequestFactory();
+						boost::format fmessage = boost::format("This time [%s]  received : %s records, total got %s records")
+							% mRequestDataSet[requestId].instrument
+							% reader->size()
+							% mRequestDataSet[requestId].getNums; //"查询历史价格："
+						std::string message = fmessage.str();
+						this->api->sendMessage(message);
+					}
+					catch (const std::exception&ee)
+					{
+						std::cout << ee.what() << __LINE__ << std::endl;
+					}
+					// 构造Task,发送数据给python终端
+					Task task = Task();
+					task.task_name = OnGetHisPrices_smart;
+					task.instrument = mRequestDataSet[requestId].instrument;
+					task.task_data = reader;
+					//将response返回到api，在那里对数据进行遍历，并构造dict数据
+					//不能在这里构造boost::python下的数据类型，会出错
+					this->api->putTask(task);
+					//std::cout << "  end send task " << __LINE__ << std::endl;
+					//判断是否返回了所有历史数据，如果endDate为节假日，可能会有问题
+					if (fabs(mRequestDataSet[requestId].endDate - reader->getDate(0)) > 0.0001 //返回数据中最新记录的日期是否等于endDate
+																							   /*|| mRequestDataSet[requestId].maxBars > mRequestDataSet[requestId].getNums*/ //maxBarsw为单次返回的历史数据的最大笔数
+						)
+					{
+						mRequestDataSet[requestId].endDate = reader->getDate(0); // 返回数据的最新的时间
+						needquestAgain = true;
 
-						//5. 获取 IO2GTimeframeCollection:
-						O2G2Ptr<IO2GTimeframeCollection> timeframeCollection = factory->getTimeFrameCollection();
-						// 6. 获取 the IO2GTimeframe 从 mRequestDataSet中获取:
-						O2G2Ptr<IO2GTimeframe> timeFrame = timeframeCollection->get( this->mRequestDataSet[requestId].stimeFrame.c_str() );
-
-						// 通过工程类创建request
-						O2G2Ptr<IO2GRequest> request = factory->createMarketDataSnapshotRequestInstrument(
-							mRequestDataSet[requestId].instrument.c_str(),//货币对名称
-							timeFrame,	//时间跨度，如m1，m5，h1等
-							mRequestDataSet[requestId].maxBars);	//单次最大返回数据数量，如果fromtime 到 totime中的数据超过maxbars，则分多次返回
-
-						factory->fillMarketDataSnapshotRequestTime(
-							request,								//请求
-							mRequestDataSet[requestId].beginDate,	//from时间
-							mRequestDataSet[requestId].endDate, false);	// to时间
-
-						//保存本次查询的相关信息	
-						sFxcmRequestData reqData;
-						reqData.instrument = mRequestDataSet[requestId].instrument;
-						reqData.stimeFrame = mRequestDataSet[requestId].stimeFrame;
-						reqData.beginDate = mRequestDataSet[requestId].beginDate;
-						reqData.endDate = mRequestDataSet[requestId].endDate;
-						reqData.getNums = 0;
-						this->mRequestDataSet[string(request->getRequestID())] = reqData;
-						//再次查询	
-						mSession->sendRequest(request);
-
-
-						string sBeginDate;
-						string sEndDate;
-						//0.0 会被转换为string“1899/12/30 00:00:00”
-						Tools::formatDate(mRequestDataSet[requestId].beginDate, sBeginDate);
-						Tools::formatDate(mRequestDataSet[requestId].endDate, sEndDate);
-
-						try
+						// 继续查询历史数据
+						if (needquestAgain)
 						{
-							boost::format fmessage = boost::format("Qry Historal Prices : %s from %s to %s")
-								% mRequestDataSet[requestId].instrument 
-								% sBeginDate % sEndDate; //"查询历史价格："
-							std::string message = fmessage.str();
-							//std::cout << "Request Market Instrument prices : " << message << __LINE__ << std::endl;
-							//api->sendMessage("req offer price again! req offer price again! req offer price again! req offer price again! req offer price again! req offer price again! ");
-							api->sendMessage(message);//不行，原因是什么？居然是混入了一个汉字的标点符号！！！
-						}
-						catch (const std::exception&ee)
-						{
-							std::cout << ee.what() << __LINE__ << std::endl;
+							//填充request
+							O2G2Ptr<IO2GRequestFactory> factory = mSession->getRequestFactory();
+
+							//5. 获取 IO2GTimeframeCollection:
+							O2G2Ptr<IO2GTimeframeCollection> timeframeCollection = factory->getTimeFrameCollection();
+							// 6. 获取 the IO2GTimeframe 从 mRequestDataSet中获取:
+							O2G2Ptr<IO2GTimeframe> timeFrame = timeframeCollection->get(this->mRequestDataSet[requestId].stimeFrame.c_str());
+
+							// 通过工程类创建request
+							O2G2Ptr<IO2GRequest> request = factory->createMarketDataSnapshotRequestInstrument(
+								mRequestDataSet[requestId].instrument.c_str(),//货币对名称
+								timeFrame,	//时间跨度，如m1，m5，h1等
+								mRequestDataSet[requestId].maxBars);	//单次最大返回数据数量，如果fromtime 到 totime中的数据超过maxbars，则分多次返回
+
+							factory->fillMarketDataSnapshotRequestTime(
+								request,								//请求
+								mRequestDataSet[requestId].beginDate,	//from时间
+								mRequestDataSet[requestId].endDate, false);	// to时间
+
+																			//保存本次查询的相关信息	
+							sFxcmRequestData reqData;
+							reqData.instrument = mRequestDataSet[requestId].instrument;
+							reqData.stimeFrame = mRequestDataSet[requestId].stimeFrame;
+							reqData.beginDate = mRequestDataSet[requestId].beginDate;
+							reqData.endDate = mRequestDataSet[requestId].endDate;
+							reqData.getNums = 0;
+							this->mRequestDataSet[string(request->getRequestID())] = reqData;
+							//再次查询	
+							mSession->sendRequest(request);
+
+
+							string sBeginDate;
+							string sEndDate;
+							//0.0 会被转换为string“1899/12/30 00:00:00”
+							Tools::formatDate(mRequestDataSet[requestId].beginDate, sBeginDate);
+							Tools::formatDate(mRequestDataSet[requestId].endDate, sEndDate);
+
+							try
+							{
+								boost::format fmessage = boost::format("Qry Historal Prices : %s from %s to %s")
+									% mRequestDataSet[requestId].instrument
+									% sBeginDate % sEndDate; //"查询历史价格："
+								std::string message = fmessage.str();
+								//std::cout << "Request Market Instrument prices : " << message << __LINE__ << std::endl;
+								//api->sendMessage("req offer price again! req offer price again! req offer price again! req offer price again! req offer price again! req offer price again! ");
+								api->sendMessage(message);//不行，原因是什么？居然是混入了一个汉字的标点符号！！！
+							}
+							catch (const std::exception&ee)
+							{
+								std::cout << ee.what() << __LINE__ << std::endl;
+							}
 						}
 					}
-				}					
-			}
+				}
+			}			
 		}
 		return;
 	}
@@ -246,7 +245,7 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 				task.instrument = "Error Instrument";
 			}
 			
-			task.task_data = reader;
+			task.task_data = reader.Detach();
 			//插入task队列
 			this->api->putTask(task);
 		}

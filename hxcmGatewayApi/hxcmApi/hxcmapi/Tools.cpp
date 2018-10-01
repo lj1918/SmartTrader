@@ -120,6 +120,7 @@ void Tools::formatDate(DATE d, std::string &buf)
 	 O2G2Ptr<IO2GLoginRules> loginRules = session->getLoginRules();
 	 if (loginRules)
 	 {
+		 PRINTLINE("loginRules");
 		 O2G2Ptr<IO2GResponse> response = loginRules->getTableRefreshResponse(Accounts);
 		 if (response)
 		 {
@@ -127,22 +128,26 @@ void Tools::formatDate(DATE d, std::string &buf)
 			 if (readerFactory)
 			 {
 				 O2G2Ptr<IO2GAccountsTableResponseReader> reader = readerFactory->createAccountsTableReader(response);
-
+				 PRINTLINE("reader->size() = " +reader->size());
 				 for (int i = 0; i < reader->size(); ++i)
 				 {
 					 O2G2Ptr<IO2GAccountRow> account = reader->getRow(i);
 					 if (account)
-						 if (sAccountID  != "" || account->getAccountID() == sAccountID )
-							 if (account->getMarginCallFlag() == "N"
-								 && (account->getAccountKind() == "32" || account->getAccountKind() == "36"))
+						 if (sAccountID != "" || account->getAccountID() == sAccountID)
+						 {
+							 string strMarginCallFlag = account->getMarginCallFlag();
+							 string strAccountKind = account->getAccountKind();
+							 // account->getAccountKind() == "N" 不能这样比较，会
+							 if (strMarginCallFlag == "N" && (strAccountKind == "32"	 || strAccountKind == "36") )
 							 {
 								 return account.Detach();
 							 }
-								 
+						 }	 
 				 }
 			 }
 		 }
 	 }
+	 PRINTLINE("Tools::GetAccount ERROR, return NULL");
 	 return NULL;
  }
 
