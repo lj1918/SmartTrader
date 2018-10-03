@@ -3,6 +3,7 @@
 #include "hxcmapi.h"
 #include "Tools.h"
 #include <boost/format.hpp>
+#include "OrderMonitor.h"
 
 using namespace std;
 ResponseListener::~ResponseListener()
@@ -252,21 +253,6 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 		//mRequestComplete = true;
 
 	}
-	// 创建Order请求的响应,收到该响应不意味着Order执行成功，仅仅表示服务器收到该请求
-	if (response->getType() == O2GResponseType::CreateOrderResponse)
-	{
-		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = mSession->getResponseReaderFactory();
-		O2G2Ptr <IO2GOrderResponseReader> reader = readerFactory->createOrderResponseReader(response);
-		if (reader)
-		{
-			string result = " fxcm server recieved the Request of Order : " + string(reader->getOrderID());
-			Task task = Task();
-			task.task_name = OnMessage_smart;
-			task.task_data = result;
-			this->api->putTask(task);
-		}
-	}
-
 }
 
 void ResponseListener::onRequestFailed(const char * requestId, const char * error)
@@ -281,25 +267,25 @@ void ResponseListener::onRequestFailed(const char * requestId, const char * erro
 // 
 void ResponseListener::onTablesUpdates(IO2GResponse * data)
 {
-	if (data->getType() == TablesUpdates)
+	try
 	{
-		O2GResponseType repType = data->getType();
-		PRINTLINE(repType);
-		//货币对实时报价的订阅消息处理
-		if (repType == O2GResponseType::TablesUpdates)
+		if (data->getType() == TablesUpdates)
 		{
-			O2G2Ptr<IO2GResponseReaderFactory> factory = mSession->getResponseReaderFactory();
-			if (factory)
+			O2GResponseType repType = data->getType();
+			PRINTLINE(repType);
+			//货币对实时报价的订阅消息处理
+			if (repType == O2GResponseType::TablesUpdates)
 			{
-				O2G2Ptr<IO2GTablesUpdatesReader> reader = factory->createTablesUpdatesReader(data);
-				if (reader)
+				O2G2Ptr<IO2GResponseReaderFactory> factory = mSession->getResponseReaderFactory();
+				if (factory)
 				{
-					for (int i = 0; i < reader->size(); i++)
+					O2G2Ptr<IO2GTablesUpdatesReader> reader = factory->createTablesUpdatesReader(data);
+					if (reader)
 					{
-						PRINTLINE(reader->getUpdateTable(i));
-						switch (reader->getUpdateTable(i))
+						for (int i = 0; i < reader->size(); i++)
 						{
-							//处理Offers表的变化
+							switch (reader->getUpdateTable(i))
+							{
 							case O2GTable::Offers:
 							{
 								// 构造Task
@@ -315,83 +301,68 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 							case O2GTable::Orders:
 							{
 								O2G2Ptr<IO2GOrderRow> orderRow = reader->getOrderRow(i);
-									if (!orderRow)
-									{
-										PRINTLINE(" orderRow is NULL  ");
-										return;
-									}
+								if (!orderRow)
+								{
+									PRINTLINE(" orderRow is NULL  ");
+									return;
+								}
 								if (reader->getUpdateType(i) == Insert)
 								{
-									PRINTLINE("The order has been added.OrderID = '" + string(orderRow->getOrderID()));
-									// 此处仅表明服务器接受了该订单，但是不意味着订单被市场接受
-									// 故此仅发出一个通知消息而已
 									Task task = Task();
-									task.task_name = OnMessage_smart;
-									task.task_data = "The order has been added. OrderID = " + string(orderRow->getOrderID());
+									task.task_name = OnSendOpenMarketOrderResult_smart;
+									task.task_data = orderRow;
 									this->api->putTask(task);
+
 								}
 								else if (reader->getUpdateType(i) == Delete)
 								{
-									PRINTLINE("The order has been deleted. OrderID = '" + string(orderRow->getOrderID()));
-									//当一个订单被市场接受后，该订单会被删除
-									Task task = Task();
-									task.task_name = OnMessage_smart;
-									task.task_data = "The order has been deleted. OrderID = " + string(orderRow->getOrderID());
-									this->api->putTask(task);
+
 								}
-								break;
+
 							}
 							break;
-							case O2GTable::Trades: 
-							{
-								if (reader->getUpdateType(i) == Insert)
-								{
-									// 有订单被市场接受，仓位也会变化
-									O2G2Ptr<IO2GTradeRow> tradeRow = reader->getTradeRow(i);
-									Task task = Task();
-									task.task_name = OnSendOpenMarketOrderResult_smart;
-									task.task_data = tradeRow;
-									this->api->putTask(task);									
-								}
-								break;
-							}
 							case O2GTable::Messages:
 							{
-								O2G2Ptr<IO2GMessageRow> messageRow = reader->getMessageRow(i);
-								if ( reader->getUpdateType(i) == O2GTableUpdateType::Insert  
-									|| reader->getUpdateType(i) == O2GTableUpdateType::Update )
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Insert
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Update)
+								{
+									O2G2Ptr<IO2GMessageRow> messageRow = reader->getMessageRow(i);
+									if (messageRow)
 									{
-										O2G2Ptr<IO2GMessageRow> messageRow = reader->getMessageRow(i);
-										if (messageRow)
-								{								
-									PRINTLINE(messageRow->getText());
-									Task task = Task();
-									task.task_name = OnMessage_smart;
-									if (reader->getUpdateType(i) == O2GTableUpdateType::Insert)
-									{
-										task.task_data = "new Message : " + string(messageRow->getText());
-									}
-									else
-									{
-										task.task_data = "Update Message : " + string(messageRow->getText());
-									}
-								
-									task.task_last = true;
-									this->api->putTask(task);
+										PRINTLINE(messageRow->getText());
+										Task task = Task();
+										task.task_name = OnMessage_smart;
+										if (reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+										{
+											task.task_data = "new Message : " + string(messageRow->getText());
 										}
+										else
+										{
+											task.task_data = "Update Message : " + string(messageRow->getText());
+										}
+
+										task.task_last = true;
+										this->api->putTask(task);
+									}
 									break;
 								}
 							}
 							default:
 								break;
+							}
 						}
 					}
-				}
-				
-			}
-		}		
 
+				}
+			}
+
+		}
 	}
+	catch (const std::exception& ee)
+	{
+		PRINTLINE(ee.what());
+		return;
+	}	
 }
 
 /** Gets response.*/

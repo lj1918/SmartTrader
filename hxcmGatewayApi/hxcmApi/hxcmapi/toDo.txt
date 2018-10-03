@@ -4,3 +4,11 @@
 
 3、完成getTradingSettingsProvider相关的接口包装
    对所有货币对的最小交易手数、保证金要求等待
+   qryInstrumentInfo
+4、完成SendMarketOrder,开一个市价单
+   SendMarketOrder之后，在ResponseListener::onTablesUpdates中处理相关消息
+   1）Orders表：
+      首先处理UpdateTyp 等于 Insert
+	  然后处理UpdateTyp 等于 Delete
+	2）Trades表
+	  首先，处理UpdateTyp 等于 Insert，此时该Order在市场上被成交，开仓成功

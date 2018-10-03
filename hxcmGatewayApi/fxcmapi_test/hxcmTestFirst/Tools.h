@@ -43,8 +43,7 @@ public:
 	static string OfferID2OfferName(IO2GSession *session,string offerid);
 	// Determine order type based on parameters: current market price of a trading instrument, desired order rate, order direction
 	static  std::string getEntryOrderType(double dBid, double dAsk, double dRate, const char *sBuySell, double dPointSize, int iCondDistLimit, int iCondDistStop);
-	// 返回枚举类型O2GTable对应的字符串
-	static std::string getO2GTableTypeName(O2GTable table);
+
 
 };
 
