@@ -302,24 +302,28 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 							//处理Offers表的变化
 							case O2GTable::Offers:
 							{
-								// 构造Task
-								Task task = Task();
-								task.task_name = OnGetSubScribeData_smart;
-								task.task_data = reader;// 不能用reader.Detach()，后面进行类型cast时会出错 ??
-														//将reader返回到api，在那里对数据进行遍历，并构造list数据
-														//不能在这里构造，无法传递到python
-								this->api->putTask(task);
-
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Update
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+								{
+									// 构造Task
+									Task task = Task();
+									task.task_name = OnGetSubScribeData_smart;
+									task.task_data = reader;// 不能用reader.Detach()，后面进行类型cast时会出错 ??
+															//将reader返回到api，在那里对数据进行遍历，并构造list数据
+															//不能在这里构造，无法传递到python
+									this->api->putTask(task);
+								}	
 							}
 							break;
 							case O2GTable::Orders:
 							{
 								O2G2Ptr<IO2GOrderRow> orderRow = reader->getOrderRow(i);
-									if (!orderRow)
-									{
-										PRINTLINE(" orderRow is NULL  ");
-										return;
-									}
+								
+								if (!orderRow)
+								{
+									PRINTLINE(" orderRow is NULL  ");
+									return;
+								}
 								if (reader->getUpdateType(i) == Insert)
 								{
 									PRINTLINE("The order has been added.OrderID = '" + string(orderRow->getOrderID()));
@@ -344,14 +348,58 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 							break;
 							case O2GTable::Trades: 
 							{
-								if (reader->getUpdateType(i) == Insert)
+								O2G2Ptr<IO2GTradeRow> tradeRow = reader->getTradeRow(i);
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Insert
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Update)
 								{
-									// 有订单被市场接受，仓位也会变化
-									O2G2Ptr<IO2GTradeRow> tradeRow = reader->getTradeRow(i);
+									// 有订单被市场接受，仓位也会变化									
 									Task task = Task();
-									task.task_name = OnSendOpenMarketOrderResult_smart;
+									task.task_name = OnTradesTableUpdate_smart;// 应该修改为OnTradesUpdate
 									task.task_data = tradeRow;
-									this->api->putTask(task);									
+									this->api->putTask(task);	
+
+									Task taskmessage = Task();
+									taskmessage.task_name = OnMessage_smart;// 应该修改为OnTradesUpdate
+									string msg = "Added or Updated trade, TradeId = " + string(tradeRow->getTradeID());
+									taskmessage.task_data = msg;
+									this->api->putTask(taskmessage);
+								}
+								else if (reader->getUpdateType(i) == O2GTableUpdateType::Delete)
+								{
+									Task taskmessage = Task();
+									taskmessage.task_name = OnMessage_smart;// 应该修改为OnTradesUpdate
+									string msg = "deleted trade, TradeId = " + string(tradeRow->getTradeID());
+									taskmessage.task_data = msg;
+									this->api->putTask(taskmessage);
+								}
+								break;
+							}
+							case O2GTable::Accounts:
+							{
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Update 
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+								{
+									O2G2Ptr<IO2GAccountRow > tradeRow = reader->getAccountRow(i);
+									// 账户更新事件
+									Task task = Task();
+									task.task_name = OnAccountsTableUpdate_smart;
+									task.task_data = tradeRow;
+									this->api->putTask(task);
+								}
+								break;
+							}
+							case O2GTable::ClosedTrades:
+							{
+								PRINTLINE("O2GTable::ClosedTrades");
+								O2G2Ptr<IO2GClosedTradeRow > closedtradeRow = reader->getClosedTradeRow(i);
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Update
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+								{
+									// 账户更新事件
+									Task task = Task();
+									task.task_name = OnClosedTradeTableUpdate_smart;
+									task.task_data = closedtradeRow;
+									this->api->putTask(task);
 								}
 								break;
 							}
@@ -381,6 +429,12 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 										}
 									break;
 								}
+							}
+							case O2GTable::Summary:
+							{
+								PRINTLINE("O2GTable::Summary");
+
+								break;
 							}
 							default:
 								break;

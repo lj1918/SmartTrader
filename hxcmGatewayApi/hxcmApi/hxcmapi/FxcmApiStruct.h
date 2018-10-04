@@ -12,7 +12,9 @@ using namespace boost;
 #define		OnGetSubScribeData_smart		2 //获取订阅的货币对（instrument）的市场报价（offer）
 #define		OnMessage_smart					3 //返回给客户端的信息，包括出错信息
 #define     OnQryPosition_smart				4 //查询货币对的仓位信息
-#define     OnSendOpenMarketOrderResult_smart		5 //OpenMarketOrder的result
+#define     OnTradesTableUpdate_smart		5 //OpenMarketOrder的result
+#define     OnAccountsTableUpdate_smart					6 //Accounts表更新事件
+#define     OnClosedTradeTableUpdate_smart              7 //ClosedTradeTable表跟新事件
 
 struct SFxcmLoginField
 {

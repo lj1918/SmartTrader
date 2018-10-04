@@ -12,3 +12,5 @@
 	  然后处理UpdateTyp 等于 Delete
 	2）Trades表
 	  首先，处理UpdateTyp 等于 Insert，此时该Order在市场上被成交，开仓成功
+5、添加onAccountsUpdate事件，用于返回Accounts变化的信息
+6、添加onSummaryUpdate事件，返回Summary变化的信息

@@ -39,9 +39,16 @@ if __name__ == '__main__':
         def onSendOrderResult(self,data):
             print("onSendOrderResult :" ,data)
             pass
-
+        def onAccountsUpdate(self,data):
+            print("onAccountsUpdate : " ,data)
+            pass
+        def onClosedTradeTableUpdate(self,data):
+            print("onClosedTradeTableUpdate : ",data)
+            pass
     api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo","1117090")
     api.Login(True)
+    result = api.qryAccount("1117090")
+    print(result)
     result  = api.SendOpenMarketOrder("EUR/USD",
                                       "1117090",
                                       "B",
@@ -49,8 +56,8 @@ if __name__ == '__main__':
                                       8.88,
                                       "lj721226")
     print("result = ",result)
-    # result = api.qryAccount("1117090")
-    # print(result)
+    result = api.qryAccount("1117090")
+    print(result)
     # result = api.qryInstrumentInfo()
     # print(result)
     # print(result['bb'])

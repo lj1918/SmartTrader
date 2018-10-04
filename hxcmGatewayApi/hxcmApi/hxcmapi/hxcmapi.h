@@ -224,7 +224,7 @@ public:
 	//==================================================================================
 	// 创建一个Open Order，即指定价格的订单
 	//==================================================================================
-	//未完成
+	//发送市场Order
 	int SendOpenMarketOrder(string symbol,//货币对的名称，例如"EUR/USD"
 					   string AccountID,	//账号ID
 					   string BuyOrSell,	// B 买，S 卖
@@ -233,9 +233,20 @@ public:
 					   double ClientRate,
 					   string CustomID 
 	);
-	// 市场单消息的处理函数
-	void processSendOpenMarketOrder(Task task);
-	// 订单的反馈信息
-	virtual void onSendOrderResult(boost::python::list data) {};
-	
+
+
+	//==================================================================================
+	// Accounts表更新处理事件，
+	//==================================================================================
+	// Accounts表更新处理事件
+	void processAccountsUpdate(Task task);
+	virtual void onAccountsUpdate(boost::python::list data) {};
+
+	// TradesTable更新处理事件,sendXXXOrder等命令会触发
+	void processTradesTableUpdate(Task task);
+	virtual void onTradesTableUpdate(boost::python::list data) {};
+
+	//ClosedTradeTable表更新事件
+	void processClosedTradeTableUpdate(Task task);
+	virtual void onClosedTradeTableUpdate(boost::python::list data) {};
 };
