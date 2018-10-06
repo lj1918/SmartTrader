@@ -16,8 +16,7 @@ public:
 	static void formatDate(DATE d, std::string &buf);
 	//static COleDateTime myString2Date(string  timeStr);
 	static COleDateTime String2OleDateTime(char const * timeStr);
-	//将字符串转换为Date
-	//static DATE String2Date(char const * strdatetime);
+
 	///-------------------------------------------------------------------------------------
 	///从Python对象到C++类型转换用的函数
 	///-------------------------------------------------------------------------------------
@@ -29,6 +28,9 @@ public:
 	static  void getStr(dict d, string key, char *value);
 	//从字典中获取某个建值对应的字符串，并赋值到请求结构体对象的值上
 	static  void getChar(dict d, string key, char *value);
+	///-------------------------------------------------------------------------------------
+	///便利函数
+	///-------------------------------------------------------------------------------------
 	//将时间从本地时间转换为UTC时间
 	static DATE ConvertLocal2UTC(IO2GSession *pSession, DATE s);
 	//将UTC时间转换为本地时间
@@ -43,7 +45,9 @@ public:
 	static string OfferID2OfferName(IO2GSession *session,string offerid);
 	// Determine order type based on parameters: current market price of a trading instrument, desired order rate, order direction
 	static  std::string getEntryOrderType(double dBid, double dAsk, double dRate, const char *sBuySell, double dPointSize, int iCondDistLimit, int iCondDistStop);
-
-
+	// 返回枚举类型O2GTable对应的字符串
+	static std::string getO2GTableTypeName(O2GTable table);
+	// 更加tradeid获取trade对象
+	static IO2GTradeRow * getTradeRow(IO2GTableManager *tableManager, const char *tradeID);
 };
 

@@ -206,33 +206,7 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 		if (readerFactory)
 		{
 			O2G2Ptr<IO2GTradesTableResponseReader> reader = readerFactory->createTradesTableReader(response);
-			/*
-			for (int i = 0; i < reader->size(); i++)
-			{
-				O2G2Ptr<IO2GTradeRow> trade = reader->getRow(i);
-				string opentime = "";
-				Tools::formatDate( trade->getOpenTime(), opentime);
-
-				std::cout << " This is a response to your request: \nTradeID = " << trade->getTradeID() <<
-					" OfferID = " << trade->getOfferID() <<
-					" OfferInstrument = " << Tools::OfferID2OfferName(this->mSession, trade->getOfferID()) <<
-					" AccountName = " << trade->getAccountName() <<
-					" OpenOrderID  = " << trade->getOpenOrderID() <<
-					" OpenOrderReqID = " << trade->getOpenOrderReqID() <<
-					" getOpenOrderRequestTXT = " << trade->getOpenOrderRequestTXT() <<
-					" getOpenQuoteID = " << trade->getOpenQuoteID() <<
-					" TradeIDOrigin = " << trade->getTradeIDOrigin() <<
-					" Commission = " << trade->getCommission() <<
-					" UsedMargin = " << trade->getUsedMargin() <<
-					" OpenRate = " << trade->getOpenRate() << 
-					" OpenTime = " << opentime <<
-					" OpenTime = " << trade->getOpenTime() <<
-					" ValueDate = " << trade->getValueDate() <<
-					" Parties = " << trade->getParties() <<
-					" BuySell = " << trade->getBuySell() <<
-					" Amount = " << trade->getAmount() << std::endl;
-			}
-			*/
+			
 			// 构造Task,发送数据给python终端
 			Task task = Task();
 			task.task_name = OnQryPosition_smart;
@@ -245,7 +219,7 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 				task.instrument = "Error Instrument";
 			}
 			
-			task.task_data = reader.Detach();
+			task.task_data = reader;
 			//插入task队列
 			this->api->putTask(task);
 		}
@@ -267,6 +241,20 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 		}
 	}
 
+	// 查询ClosedTradeTable的响应
+	if (response->getType() == O2GResponseType::GetClosedTrades)
+	{
+		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = mSession->getResponseReaderFactory();
+		O2G2Ptr <IO2GClosedTradesTableResponseReader > reader = readerFactory->createClosedTradesTableReader(response);
+		if (reader)
+		{
+			Task task = Task();
+			task.task_name = OnQryClosed_TradesTable_smart;
+			task.task_data = reader;
+			this->api->putTask(task);
+		}
+	}
+
 }
 
 void ResponseListener::onRequestFailed(const char * requestId, const char * error)
@@ -281,7 +269,7 @@ void ResponseListener::onRequestFailed(const char * requestId, const char * erro
 // 
 void ResponseListener::onTablesUpdates(IO2GResponse * data)
 {
-	if (data->getType() == TablesUpdates)
+	if (data->getType() == O2GResponseType::TablesUpdates)
 	{
 		O2GResponseType repType = data->getType();
 		PRINTLINE(repType);

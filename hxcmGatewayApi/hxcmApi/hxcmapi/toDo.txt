@@ -13,4 +13,18 @@
 	2）Trades表
 	  首先，处理UpdateTyp 等于 Insert，此时该Order在市场上被成交，开仓成功
 5、添加onAccountsUpdate事件，用于返回Accounts变化的信息
-6、添加onSummaryUpdate事件，返回Summary变化的信息
+6、添加qryClosed_TradesTable事件，返回Closed_TradesTable
+7、添加SendCloseMarketOrder与SendCloseAllPositionsByInstrument命令，
+8、添加qryInstrumentRealtimeInfo命令
+9、添加SendOpenRangeOrder命令
+10、添加
+	void SendCloseRangeOrderFloat(string tradeid,double minRate,double maxRate, string customID);
+	void SendCloseRangeOrderInt(string tradeid, int minPoint, int maxPoint, string customID);
+	目前仅将SendCloseRangeOrderFloat(string tradeid,double minRate,double maxRate, string customID)公开到python中
+	根据未来api的使用情况在决定
+11、添加SendCreateOpenLimitOrder命令
+12、添加SendCloseLimitOrder命令
+13、添加SendEntryStopOrder、SendEntryLimitOrder
+14、添加SendDeleteOrder命令
+15、添加SendEditOrder命令
+

@@ -8,6 +8,8 @@ using namespace std;
 using namespace boost;
 
 // 常量
+#define     CustomID_smart		"liujun_smartWorkShop"
+
 #define		OnGetHisPrices_smart			1  //获取历史数据标记
 #define		OnGetSubScribeData_smart		2 //获取订阅的货币对（instrument）的市场报价（offer）
 #define		OnMessage_smart					3 //返回给客户端的信息，包括出错信息
@@ -15,6 +17,7 @@ using namespace boost;
 #define     OnTradesTableUpdate_smart		5 //OpenMarketOrder的result
 #define     OnAccountsTableUpdate_smart					6 //Accounts表更新事件
 #define     OnClosedTradeTableUpdate_smart              7 //ClosedTradeTable表跟新事件
+#define     OnQryClosed_TradesTable_smart				8 // 查询ClosedTradeTable
 
 struct SFxcmLoginField
 {
@@ -76,4 +79,18 @@ enum eTimeFrames
 	H6		=	360,
 	D1		=	24*60,
 	W1		=	7*24*60
+};
+
+enum OrderSide
+{
+	Buy,
+	Sell,
+	Both
+};
+
+struct CloseOrderData
+{
+	std::string offerID;
+	OrderSide side;
+	std::string account;
 };

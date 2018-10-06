@@ -17,6 +17,12 @@ void Tools::formatDate(DATE d, std::string &buf)
 		<< std::setfill('0') << std::setw(2) << t.tm_sec;
 	buf = sstream.str();
 }
+string Tools::Date2String(DATE d)
+{
+	string result;
+	Tools::formatDate(d, result);
+	return result;
+}
 
 // 输入时间：2018-08-30 15:35:34 369，不支持"/"
 // COleDateTime转换为DATE ：double（COleDateTime）
@@ -188,6 +194,20 @@ void Tools::formatDate(DATE d, std::string &buf)
 	 return resultOffer;
  }
 
+ IO2GOfferRow * Tools::getOfferRow(IO2GTableManager *tableManager, string intrument)
+ {
+	 O2G2Ptr<IO2GOffersTable> offersTable = (IO2GOffersTable *)tableManager->getTable(Offers);
+	 for (int i = 0; i < offersTable->size(); ++i)
+	 {
+		 O2G2Ptr<IO2GOfferRow> offer = offersTable->getRow(i);
+		 if (intrument == string(offer->getInstrument()))
+		 {
+			 return offer.Detach();
+		 }
+	 }
+	 return NULL;
+ }
+
  string Tools::GetResponseType(O2GResponseType type)
  {
 	 string result = "unknow";
@@ -302,6 +322,18 @@ void Tools::formatDate(DATE d, std::string &buf)
 	 return result;
  }
 
+ string Tools::OfferName2offerId(IO2GSession *session, string instrument)
+ {
+	 O2G2Ptr<IO2GOffersTable> offersTable = (IO2GOffersTable *)session->getTableManager()->getTable(Offers);
+	 for (int i = 0; i < offersTable->size(); i++)
+	 {
+		 O2G2Ptr<IO2GOfferRow> offer = offersTable->getRow(i);
+		 if (strcmp(instrument.c_str(), offer->getInstrument()) == 0)
+			 return offer->getOfferID();
+	 }
+	 return "unknow instrment : " + instrument;
+ }
+
  std::string Tools::getEntryOrderType(double dBid, double dAsk, double dRate, const char *sBuySell, double dPointSize, int iCondDistLimit, int iCondDistStop)
  {
 	 double dAbsoluteDifference = 0.0;
@@ -386,3 +418,17 @@ void Tools::formatDate(DATE d, std::string &buf)
 	 }
 	 return result;
  }
+
+ IO2GTradeRow * Tools::getTradeRow(IO2GTableManager *tableManager, const char *tradeID)
+ {
+	 O2G2Ptr<IO2GTradesTable> tradesTable = (IO2GTradesTable *)tableManager->getTable(Trades);
+	 for (int i = 0; i < tradesTable->size(); ++i)
+	 {
+		 O2G2Ptr<IO2GTradeRow> trade = tradesTable->getRow(i);
+		 if (strcmp(tradeID, trade->getTradeID()) == 0 )
+			 return trade.Detach();
+	 }
+	 return NULL;
+ }
+
+

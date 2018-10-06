@@ -335,3 +335,66 @@ void Tools::formatDate(DATE d, std::string &buf)
 		 return O2G2::Orders::LimitEntry;
 	 }
  }
+ std::string Tools::getO2GTableTypeName(O2GTable type)
+ {
+	 string result = "unknow";
+	 switch (type)
+	 {
+	 case O2GTable::Accounts:
+	 {
+		result = "Accounts";
+		break;
+	 }
+	 case O2GTable::ClosedTrades:
+	 {
+		 result = "ClosedTrades";
+		 break;
+	 }
+	 case O2GTable::Messages:
+	 {
+		 result = "Messages";
+		 break;
+	 }
+
+	 case O2GTable::Offers:
+	 {
+		 result = "Offers";
+		 break;
+	 }
+	 case O2GTable::Orders:
+	 {
+		 result = "Orders";
+		 break;
+	 }
+	 case O2GTable::Summary:
+	 {
+		 result = "Summary";
+		 break;
+	 }
+	 case O2GTable::TableUnknown:
+	 {
+		 result = "TableUnknown";
+		 break;
+	 }
+	 case O2GTable::Trades:
+	 {
+		 result = "Trades";
+		 break;
+	 }
+	 default:
+		 break;
+	 }
+	 return result;
+ }
+
+ IO2GTradeRow * Tools::getTradeRow(IO2GTableManager *tableManager, const char *tradeID)
+ {
+	 O2G2Ptr<IO2GTradesTable> tradesTable = (IO2GTradesTable *)tableManager->getTable(Trades);
+	 for (int i = 0; i < tradesTable->size(); ++i)
+	 {
+		 O2G2Ptr<IO2GTradeRow> trade = tradesTable->getRow(i);
+		 if (strcmp(tradeID, trade->getTradeID()) == 0 )
+			 return trade.Detach();
+	 }
+	 return NULL;
+ }

@@ -45,23 +45,35 @@ if __name__ == '__main__':
         def onClosedTradeTableUpdate(self,data):
             print("onClosedTradeTableUpdate : ",data)
             pass
+        def onTradesTableUpdate(self,data):
+            print("onTradesTableUpdate : ",data)
+            pass
+        def onQryClosed_TradesTable(self,data):
+            print("onQryClosed_TradesTable : ",data)
+            pass
     api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo","1117090")
+    print("=================")
     api.Login(True)
-    result = api.qryAccount("1117090")
-    print(result)
-    result  = api.SendOpenMarketOrder("EUR/USD",
-                                      "1117090",
-                                      "B",
-                                      2*1000,
-                                      8.88,
-                                      "lj721226")
-    print("result = ",result)
-    result = api.qryAccount("1117090")
-    print(result)
+    print("=================")
+    # result = api.qryAccount("1117090")
+    # print(result)
+    # result  = api.SendOpenMarketOrder("EUR/USD",
+    #                                   "1117090",
+    #                                   "B",
+    #                                   2*1000,
+    #                                   8.88,
+    #                                   "lj721226")
+    # print("result = ",result)
+    # result = api.qryAccount("1117090")
+    # print(result)
     # result = api.qryInstrumentInfo()
     # print(result)
     # print(result['bb'])
+    # api.CloseMarketOrder("62101099")
+    print(api.qryInstrumentRealtimeInfo("EUR/USD"))
+    # api.CloseAllPositionsByInstrument("EUR/USD")
     # api.qryPosition("EUR/USD")
+    # api.qryClosed_TradesTable()
     # aa = {'m5': ['EUR/USD', 'USD/JPY']}
     # api.regTick(aa)
     # api.qryHisPrices('EUR/USD','m1',300,'2018-08-16 01:00:00 ','2018-08-16 04:01:00')

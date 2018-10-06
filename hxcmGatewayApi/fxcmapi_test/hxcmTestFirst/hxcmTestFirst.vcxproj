@@ -181,7 +181,7 @@
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="ForexConnect.lib" />
+    <Library Include="..\..\..\..\ForexConnectAPIx64\lib\ForexConnect.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

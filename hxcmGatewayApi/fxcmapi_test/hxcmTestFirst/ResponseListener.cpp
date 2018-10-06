@@ -207,33 +207,7 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 		if (readerFactory)
 		{
 			O2G2Ptr<IO2GTradesTableResponseReader> reader = readerFactory->createTradesTableReader(response);
-			/*
-			for (int i = 0; i < reader->size(); i++)
-			{
-				O2G2Ptr<IO2GTradeRow> trade = reader->getRow(i);
-				string opentime = "";
-				Tools::formatDate( trade->getOpenTime(), opentime);
-
-				std::cout << " This is a response to your request: \nTradeID = " << trade->getTradeID() <<
-					" OfferID = " << trade->getOfferID() <<
-					" OfferInstrument = " << Tools::OfferID2OfferName(this->mSession, trade->getOfferID()) <<
-					" AccountName = " << trade->getAccountName() <<
-					" OpenOrderID  = " << trade->getOpenOrderID() <<
-					" OpenOrderReqID = " << trade->getOpenOrderReqID() <<
-					" getOpenOrderRequestTXT = " << trade->getOpenOrderRequestTXT() <<
-					" getOpenQuoteID = " << trade->getOpenQuoteID() <<
-					" TradeIDOrigin = " << trade->getTradeIDOrigin() <<
-					" Commission = " << trade->getCommission() <<
-					" UsedMargin = " << trade->getUsedMargin() <<
-					" OpenRate = " << trade->getOpenRate() << 
-					" OpenTime = " << opentime <<
-					" OpenTime = " << trade->getOpenTime() <<
-					" ValueDate = " << trade->getValueDate() <<
-					" Parties = " << trade->getParties() <<
-					" BuySell = " << trade->getBuySell() <<
-					" Amount = " << trade->getAmount() << std::endl;
-			}
-			*/
+			
 			// 构造Task,发送数据给python终端
 			Task task = Task();
 			task.task_name = OnQryPosition_smart;
@@ -246,12 +220,40 @@ void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse *
 				task.instrument = "Error Instrument";
 			}
 			
-			task.task_data = reader.Detach();
+			task.task_data = reader;
 			//插入task队列
 			this->api->putTask(task);
 		}
 		//mRequestComplete = true;
 
+	}
+	// 创建Order请求的响应,收到该响应不意味着Order执行成功，仅仅表示服务器收到该请求
+	if (response->getType() == O2GResponseType::CreateOrderResponse)
+	{
+		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = mSession->getResponseReaderFactory();
+		O2G2Ptr <IO2GOrderResponseReader> reader = readerFactory->createOrderResponseReader(response);
+		if (reader)
+		{
+			string result = " fxcm server recieved the Request of Order : " + string(reader->getOrderID());
+			Task task = Task();
+			task.task_name = OnMessage_smart;
+			task.task_data = result;
+			this->api->putTask(task);
+		}
+	}
+
+	// 查询ClosedTradeTable的响应
+	if (response->getType() == O2GResponseType::GetClosedTrades)
+	{
+		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = mSession->getResponseReaderFactory();
+		O2G2Ptr <IO2GClosedTradesTableResponseReader > reader = readerFactory->createClosedTradesTableReader(response);
+		if (reader)
+		{
+			Task task = Task();
+			task.task_name = OnQryClosed_TradesTable_smart;
+			task.task_data = reader;
+			this->api->putTask(task);
+		}
 	}
 }
 
@@ -267,35 +269,38 @@ void ResponseListener::onRequestFailed(const char * requestId, const char * erro
 // 
 void ResponseListener::onTablesUpdates(IO2GResponse * data)
 {
-	try
+	if (data->getType() == O2GResponseType::TablesUpdates)
 	{
-		if (data->getType() == TablesUpdates)
+		O2GResponseType repType = data->getType();
+		PRINTLINE(repType);
+		//货币对实时报价的订阅消息处理
+		if (repType == O2GResponseType::TablesUpdates)
 		{
-			O2GResponseType repType = data->getType();
-			PRINTLINE(repType);
-			//货币对实时报价的订阅消息处理
-			if (repType == O2GResponseType::TablesUpdates)
+			O2G2Ptr<IO2GResponseReaderFactory> factory = mSession->getResponseReaderFactory();
+			if (factory)
 			{
-				O2G2Ptr<IO2GResponseReaderFactory> factory = mSession->getResponseReaderFactory();
-				if (factory)
+				O2G2Ptr<IO2GTablesUpdatesReader> reader = factory->createTablesUpdatesReader(data);
+				if (reader)
 				{
-					O2G2Ptr<IO2GTablesUpdatesReader> reader = factory->createTablesUpdatesReader(data);
-					if (reader)
+					for (int i = 0; i < reader->size(); i++)
 					{
-						for (int i = 0; i < reader->size(); i++)
+						PRINTLINE(reader->getUpdateTable(i));
+						switch (reader->getUpdateTable(i))
 						{
-							switch (reader->getUpdateTable(i))
-							{
+							//处理Offers表的变化
 							case O2GTable::Offers:
 							{
-								// 构造Task
-								Task task = Task();
-								task.task_name = OnGetSubScribeData_smart;
-								task.task_data = reader;// 不能用reader.Detach()，后面进行类型cast时会出错 ??
-														//将reader返回到api，在那里对数据进行遍历，并构造list数据
-														//不能在这里构造，无法传递到python
-								this->api->putTask(task);
-
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Update
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+								{
+									// 构造Task
+									Task task = Task();
+									task.task_name = OnGetSubScribeData_smart;
+									task.task_data = reader;// 不能用reader.Detach()，后面进行类型cast时会出错 ??
+															//将reader返回到api，在那里对数据进行遍历，并构造list数据
+															//不能在这里构造，无法传递到python
+									this->api->putTask(task);
+								}	
 							}
 							break;
 							case O2GTable::Orders:
@@ -308,61 +313,127 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 								}
 								if (reader->getUpdateType(i) == Insert)
 								{
+									PRINTLINE("The order has been added.OrderID = '" + string(orderRow->getOrderID()));
+									// 此处仅表明服务器接受了该订单，但是不意味着订单被市场接受
+									// 故此仅发出一个通知消息而已
 									Task task = Task();
-									task.task_name = OnSendOpenMarketOrderResult_smart;
-									task.task_data = orderRow;
+									task.task_name = OnMessage_smart;
+									task.task_data = "The order has been added. OrderID = " + string(orderRow->getOrderID());
 									this->api->putTask(task);
 
 								}
 								else if (reader->getUpdateType(i) == Delete)
 								{
-
+									PRINTLINE("The order has been deleted. OrderID = '" + string(orderRow->getOrderID()));
+									//当一个订单被市场接受后，该订单会被删除
+									Task task = Task();
+									task.task_name = OnMessage_smart;
+									task.task_data = "The order has been deleted. OrderID = " + string(orderRow->getOrderID());
+									this->api->putTask(task);
 								}
-
+								break;
 							}
 							break;
-							case O2GTable::Messages:
+							case O2GTable::Trades: 
 							{
+								O2G2Ptr<IO2GTradeRow> tradeRow = reader->getTradeRow(i);
 								if (reader->getUpdateType(i) == O2GTableUpdateType::Insert
 									|| reader->getUpdateType(i) == O2GTableUpdateType::Update)
 								{
-									O2G2Ptr<IO2GMessageRow> messageRow = reader->getMessageRow(i);
-									if (messageRow)
-									{
-										PRINTLINE(messageRow->getText());
-										Task task = Task();
-										task.task_name = OnMessage_smart;
-										if (reader->getUpdateType(i) == O2GTableUpdateType::Insert)
-										{
-											task.task_data = "new Message : " + string(messageRow->getText());
-										}
-										else
-										{
-											task.task_data = "Update Message : " + string(messageRow->getText());
-										}
+									// 有订单被市场接受，仓位也会变化									
+									Task task = Task();
+									task.task_name = OnTradesTableUpdate_smart;// 应该修改为OnTradesUpdate
+									task.task_data = tradeRow;
+									this->api->putTask(task);	
 
-										task.task_last = true;
-										this->api->putTask(task);
+									Task taskmessage = Task();
+									taskmessage.task_name = OnMessage_smart;// 应该修改为OnTradesUpdate
+									string msg = "Added or Updated trade, TradeId = " + string(tradeRow->getTradeID());
+									taskmessage.task_data = msg;
+									this->api->putTask(taskmessage);
+								}
+								else if (reader->getUpdateType(i) == O2GTableUpdateType::Delete)
+								{
+									Task taskmessage = Task();
+									taskmessage.task_name = OnMessage_smart;// 应该修改为OnTradesUpdate
+									string msg = "deleted trade, TradeId = " + string(tradeRow->getTradeID());
+									taskmessage.task_data = msg;
+									this->api->putTask(taskmessage);
+								}
+								break;
+							}
+							case O2GTable::Accounts:
+							{
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Update 
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+								{
+									O2G2Ptr<IO2GAccountRow > tradeRow = reader->getAccountRow(i);
+									// 账户更新事件
+									Task task = Task();
+									task.task_name = OnAccountsTableUpdate_smart;
+									task.task_data = tradeRow;
+									this->api->putTask(task);
+								}
+								break;
+							}
+							case O2GTable::ClosedTrades:
+							{
+								PRINTLINE("O2GTable::ClosedTrades");
+								O2G2Ptr<IO2GClosedTradeRow > closedtradeRow = reader->getClosedTradeRow(i);
+								if (reader->getUpdateType(i) == O2GTableUpdateType::Update
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+								{
+									// 账户更新事件
+									Task task = Task();
+									task.task_name = OnClosedTradeTableUpdate_smart;
+									task.task_data = closedtradeRow;
+									this->api->putTask(task);
+								}
+								break;
+							}
+							case O2GTable::Messages:
+							{
+								O2G2Ptr<IO2GMessageRow> messageRow = reader->getMessageRow(i);
+								if ( reader->getUpdateType(i) == O2GTableUpdateType::Insert  
+									|| reader->getUpdateType(i) == O2GTableUpdateType::Update )
+									{
+										O2G2Ptr<IO2GMessageRow> messageRow = reader->getMessageRow(i);
+										if (messageRow)
+								{								
+									PRINTLINE(messageRow->getText());
+									Task task = Task();
+									task.task_name = OnMessage_smart;
+									if (reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+									{
+										task.task_data = "new Message : " + string(messageRow->getText());
 									}
+									else
+									{
+										task.task_data = "Update Message : " + string(messageRow->getText());
+									}
+								
+									task.task_last = true;
+									this->api->putTask(task);
+										}
 									break;
 								}
 							}
-							default:
+							case O2GTable::Summary:
+							{
+								PRINTLINE("O2GTable::Summary");
+
 								break;
 							}
+							default:
+								break;
 						}
 					}
-
 				}
+				
 			}
+		}		
 
-		}
 	}
-	catch (const std::exception& ee)
-	{
-		PRINTLINE(ee.what());
-		return;
-	}	
 }
 
 /** Gets response.*/
