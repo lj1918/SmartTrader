@@ -419,6 +419,7 @@ string Tools::Date2String(DATE d)
 	 return result;
  }
 
+
  IO2GTradeRow * Tools::getTradeRow(IO2GTableManager *tableManager, const char *tradeID)
  {
 	 O2G2Ptr<IO2GTradesTable> tradesTable = (IO2GTradesTable *)tableManager->getTable(Trades);

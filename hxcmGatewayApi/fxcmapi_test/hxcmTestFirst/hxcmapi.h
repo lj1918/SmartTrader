@@ -110,7 +110,7 @@ protected:
 	IO2GSession * pSession = NULL;
 	SessionStatusListener *pSessionStatusListener = NULL;
 	ResponseListener *pResponseListener = NULL;
-	IO2GRequestFactory * requestFactory = NULL;
+	//IO2GRequestFactory * requestFactory = NULL;
 
 	bool bConnected = false;
 
@@ -261,4 +261,7 @@ public:
 	void qryClosed_TradesTable();
 	void processQryClosed_TradesTable(Task task);
 	virtual void onQryClosed_TradesTable(boost::python::list data) {};
+
+	void SendOpenRangeOrder(string instrument, string BuyOrSell, int amount, double rateMin, double rateMax, string CustomID);
+	void SendOpenLimitOrder(string instrument, int amount, double rate, string buySell, string customID);
 };

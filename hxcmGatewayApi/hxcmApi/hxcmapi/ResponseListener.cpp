@@ -269,13 +269,14 @@ void ResponseListener::onRequestFailed(const char * requestId, const char * erro
 // 
 void ResponseListener::onTablesUpdates(IO2GResponse * data)
 {
+	O2GResponseType repType = data->getType();
+	PRINTLINE("IO2GResponse type = " + Tools::GetResponseType(data->getType()));
 	if (data->getType() == O2GResponseType::TablesUpdates)
-	{
-		O2GResponseType repType = data->getType();
-		PRINTLINE(repType);
+	{		
 		//货币对实时报价的订阅消息处理
 		if (repType == O2GResponseType::TablesUpdates)
 		{
+			PRINTLINE("IO2GResponse type = " + Tools::GetResponseType(data->getType()));
 			O2G2Ptr<IO2GResponseReaderFactory> factory = mSession->getResponseReaderFactory();
 			if (factory)
 			{
@@ -284,7 +285,7 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 				{
 					for (int i = 0; i < reader->size(); i++)
 					{
-						PRINTLINE(reader->getUpdateTable(i));
+						PRINTLINE(Tools::getO2GTableTypeName(reader->getUpdateTable(i)));
 						switch (reader->getUpdateTable(i))
 						{
 							//处理Offers表的变化
@@ -314,21 +315,21 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 								}
 								if (reader->getUpdateType(i) == Insert)
 								{
-									PRINTLINE("The order has been added.OrderID = '" + string(orderRow->getOrderID()));
+									PRINTLINE("The order has been added.OrderID = '" + string(orderRow->getOrderID()) + " orderType = " + string(orderRow->getType()));
 									// 此处仅表明服务器接受了该订单，但是不意味着订单被市场接受
 									// 故此仅发出一个通知消息而已
 									Task task = Task();
 									task.task_name = OnMessage_smart;
-									task.task_data = "The order has been added. OrderID = " + string(orderRow->getOrderID());
+									task.task_data = "The order has been added. OrderID = " + string(orderRow->getOrderID()) + " orderType = " + string(orderRow->getType()) ;
 									this->api->putTask(task);
 								}
 								else if (reader->getUpdateType(i) == Delete)
 								{
-									PRINTLINE("The order has been deleted. OrderID = '" + string(orderRow->getOrderID()));
+									PRINTLINE("The order has been deleted. OrderID = '" + string(orderRow->getOrderID()) + " orderType = "  + string( orderRow->getType() ) );
 									//当一个订单被市场接受后，该订单会被删除
 									Task task = Task();
 									task.task_name = OnMessage_smart;
-									task.task_data = "The order has been deleted. OrderID = " + string(orderRow->getOrderID());
+									task.task_data = "The order has been deleted. OrderID = " + string(orderRow->getOrderID()) + " orderType = " + string(orderRow->getType()) ;
 									this->api->putTask(task);
 								}
 								break;
@@ -352,8 +353,15 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 									taskmessage.task_data = msg;
 									this->api->putTask(taskmessage);
 								}
+								// 应该添加OnTradesTableUpdate_smart中对删除trade的处理
+								// 如何区分Insert、Update 与Delete ？?
 								else if (reader->getUpdateType(i) == O2GTableUpdateType::Delete)
 								{
+									Task task = Task();
+									task.task_name = OnTradesTableUpdate_smart;// 应该修改为OnTradesUpdate
+									task.task_data = tradeRow;
+									this->api->putTask(task);
+
 									Task taskmessage = Task();
 									taskmessage.task_name = OnMessage_smart;// 应该修改为OnTradesUpdate
 									string msg = "deleted trade, TradeId = " + string(tradeRow->getTradeID());
@@ -399,21 +407,21 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 									{
 										O2G2Ptr<IO2GMessageRow> messageRow = reader->getMessageRow(i);
 										if (messageRow)
-								{								
-									PRINTLINE(messageRow->getText());
-									Task task = Task();
-									task.task_name = OnMessage_smart;
-									if (reader->getUpdateType(i) == O2GTableUpdateType::Insert)
-									{
-										task.task_data = "new Message : " + string(messageRow->getText());
-									}
-									else
-									{
-										task.task_data = "Update Message : " + string(messageRow->getText());
-									}
+										{								
+											PRINTLINE(messageRow->getText());
+											Task task = Task();
+											task.task_name = OnMessage_smart;
+											if (reader->getUpdateType(i) == O2GTableUpdateType::Insert)
+											{
+												task.task_data = "new Message : " + string(messageRow->getText());
+											}
+											else
+											{
+												task.task_data = "Update Message : " + string(messageRow->getText());
+											}
 								
-									task.task_last = true;
-									this->api->putTask(task);
+											task.task_last = true;
+											this->api->putTask(task);
 										}
 									break;
 								}

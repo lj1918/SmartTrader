@@ -29,11 +29,10 @@ if __name__ == '__main__':
             # print(type(data))
             # print{'ljl'}
             # print("get:\n",data['data'])
-            print("Message : " + data['data'])
+            print("onMessage : " + data['data'])
             # msgDict[data['data']]
             pass
         def onQryPosition(self,data):
-            print("*"*45)
             print("onQryPosition : " ,data)
             pass
         def onSendOrderResult(self,data):
@@ -55,6 +54,17 @@ if __name__ == '__main__':
     print("=================")
     api.Login(True)
     print("=================")
+    qryResult= pd.DataFrame(api.qryInstrumentInfo())
+    # print(qryResult)
+    qryResult = api.qryInstrumentRealtimeInfo("EUR/USD")
+    ask = qryResult['Ask']
+    bid = qryResult['Bid']
+    pip = qryResult['PointSize']
+    minRate = ask - pip * 10
+    maxRate = ask + pip * 10
+    print("beging SendOpenRangeOrder:")
+    api.SendOpenRangeOrder("EUR/USD","B",2, minRate , maxRate ,"mySendOpenRangeOrder")
+
     # result = api.qryAccount("1117090")
     # print(result)
     # result  = api.SendOpenMarketOrder("EUR/USD",
@@ -70,7 +80,7 @@ if __name__ == '__main__':
     # print(result)
     # print(result['bb'])
     # api.CloseMarketOrder("62101099")
-    print(api.qryInstrumentRealtimeInfo("EUR/USD"))
+
     # api.CloseAllPositionsByInstrument("EUR/USD")
     # api.qryPosition("EUR/USD")
     # api.qryClosed_TradesTable()

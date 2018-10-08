@@ -8,12 +8,13 @@ using namespace boost::python;
 static修饰的类成为静态类，静态类中只能包含静态成员（被static修饰的字段、属性、方法），
 不能被实例化，不能被继承；非静态中可以包含静态成员
 */
- static class Tools
+static class Tools
 {
 	//静态类中不能存在构造函数  
 public:
 	//static void formatDate(DATE date, char *buf);
 	static void formatDate(DATE d, std::string &buf);
+	static string Date2String(DATE d);
 	//static COleDateTime myString2Date(string  timeStr);
 	static COleDateTime String2OleDateTime(char const * timeStr);
 
@@ -42,12 +43,15 @@ public:
 	// 将O2GResponseType转换为字符串
 	static string GetResponseType(O2GResponseType type);
 	//
-	static string OfferID2OfferName(IO2GSession *session,string offerid);
+	static string OfferID2OfferName(IO2GSession *session, string offerid);
+	static string OfferName2offerId(IO2GSession *session, string instrument);
 	// Determine order type based on parameters: current market price of a trading instrument, desired order rate, order direction
 	static  std::string getEntryOrderType(double dBid, double dAsk, double dRate, const char *sBuySell, double dPointSize, int iCondDistLimit, int iCondDistStop);
 	// 返回枚举类型O2GTable对应的字符串
 	static std::string getO2GTableTypeName(O2GTable table);
-	// 更加tradeid获取trade对象
+	// 根据tradeid获取trade对象
 	static IO2GTradeRow * getTradeRow(IO2GTableManager *tableManager, const char *tradeID);
+	// 根据货币对名称获取Offer对象
+	static IO2GOfferRow * getOfferRow(IO2GTableManager *tableManager, string intrument);
 };
 
