@@ -117,6 +117,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\boost_1_68_0\stage\lib;C:\Users\smart\AppData\Local\conda\conda\envs\py36\libs;../api/lib</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy  /y  “$(TargetDir)*.dll”  "D:\SmartTrader\SmartTraderFrameWork\api\fxcm\"
+copy /y   “$(TargetDir)*.pyd”  "D:\SmartTrader\SmartTraderFrameWork\api\fxcm\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

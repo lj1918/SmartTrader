@@ -1,0 +1,19 @@
+[
+    {
+        "name": "double ema",
+        "className": "DoubleMaStrategy",
+        "vtSymbol": "CY909"
+    },
+
+    {
+        "name": "atr rsi",
+        "className": "AtrRsiStrategy",
+        "vtSymbol": "AP903"
+    },
+
+    {
+        "name": "king keltner",
+        "className": "KkStrategy",
+        "vtSymbol": "IH1810"
+    }
+]
