@@ -65,6 +65,7 @@ class  Gateway(object):
         event1 = Event(type_=EVENT_ERROR)
         event1.dict_['data'] = error
         self.eventEngine.put(event1)
+        pass
 
     # ----------------------------------------------------------------------
     def onLog(self, log):
@@ -73,6 +74,7 @@ class  Gateway(object):
         event1 = Event(type_=EVENT_LOG)
         event1.dict_['data'] = log
         self.eventEngine.put(event1)
+        pass
 
     # ----------------------------------------------------------------------
     def onContract(self, contract):
@@ -81,6 +83,7 @@ class  Gateway(object):
         event1 = Event(type_=EVENT_CONTRACT)
         event1.dict_['data'] = contract
         self.eventEngine.put(event1)
+        pass
 
     # ----------------------------------------------------------------------
     def connect(self):

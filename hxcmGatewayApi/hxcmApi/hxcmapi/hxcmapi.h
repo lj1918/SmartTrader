@@ -111,7 +111,7 @@ protected:
 	SessionStatusListener *pSessionStatusListener = NULL;
 	ResponseListener *pResponseListener = NULL;
 	// 尽可能不用该变量
-	IO2GRequestFactory * mRequestFactory = NULL; 
+	//IO2GRequestFactory * mRequestFactory = NULL; 
 
 	bool bConnected = false;
 
@@ -252,6 +252,9 @@ public:
 	// 创建Create Open Limit Order 
 	void SendOpenLimitOrder(string instrument,int amount,double rate,string buySell,string customID);
 	void SendCloseLimitOrder(string tradeid,double rate,string customID);
+
+	// 创建Stop Limit Entry Order
+	//void SendOpenEntryLimitOrderWithStopLimit();
 
 	// 创建Entry Limit Order 
 	void SendEntryLimitOrder(string instument,int amount,double rate,string buySell,string customID);

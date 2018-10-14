@@ -11,5 +11,5 @@ if __name__ == '__main__':
     eventEngine = EventEngine()
     gateway = ctpGateway.gatewayClass(eventEngine)
     gateway.connect()
-    gateway.
+
 

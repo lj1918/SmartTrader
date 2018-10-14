@@ -110,7 +110,8 @@ protected:
 	IO2GSession * pSession = NULL;
 	SessionStatusListener *pSessionStatusListener = NULL;
 	ResponseListener *pResponseListener = NULL;
-	//IO2GRequestFactory * requestFactory = NULL;
+	// 尽可能不用该变量
+	//IO2GRequestFactory * mRequestFactory = NULL; 
 
 	bool bConnected = false;
 
@@ -199,12 +200,12 @@ public:
 	void StartTick(string timeFrame);
 	//定时查询最新的历史数据
 	void qryTickData(string timeFrame);
-	void qryTickData();
+	//void qryTickData();
 	//注册Tick数据
 	void regTick(dict ticks);
 
 	//处理分发来的tick任务
-	void processTick(Task task);
+	//void processTick(Task task);
 
 	//OnTick回调函数
 	virtual void onTick(dict data) {};
@@ -222,6 +223,8 @@ public:
 
 	// 查询货币对的基本信息
 	boost::python::list qryInstrumentInfo();
+	// 查询货币对的实时信息
+	boost::python::dict qryInstrumentRealtimeInfo(string instrument);
 
 	//==================================================================================
 	// 创建一个Open Order，即指定价格的订单
@@ -237,9 +240,31 @@ public:
 	);
 
 	// 以市场价格关闭仓位
-	void CloseMarketOrder(string tradeId);
+	void SendCloseMarketOrder(string tradeId);
 	// 关闭指定货币对的全部仓位
-	void CloseAllPositionsByInstrument(string instrument);
+	void SendCloseAllPositionsByInstrument(string instrument);
+	// 创建Open Range Order 
+	void SendOpenRangeOrder(string instrument,string BuyOrSell,int amount,double rateMin,double rateMax,string CustomID);
+	// 创建Close Range Order，指明价格范围
+	void SendCloseRangeOrderFloat(string tradeid,double minRate,double maxRate, string customID);
+	// 创建Close Range Order，指明浮动pips
+	void SendCloseRangeOrderInt(string tradeid, int minPoint, int maxPoint, string customID);
+	// 创建Create Open Limit Order 
+	void SendOpenLimitOrder(string instrument,int amount,double rate,string buySell,string customID);
+	void SendCloseLimitOrder(string tradeid,double rate,string customID);
+
+	// 创建Entry Limit Order 
+	void SendEntryLimitOrder(string instument,int amount,double rate,string buySell,string customID);
+
+	//创建Entry Stop Order 
+	void SendEntryStopOrder(string instument,int amount, double rate, string buySell, string customID);
+
+	// 创建delete order命令
+	void SendDeleteOrder(string orderid, string customID);
+
+	// 创建Edit Order 
+	void SendEditOrder(string orderid, int amount, double rate, int trailStep, string customID);
+
 
 
 	//==================================================================================
@@ -262,6 +287,5 @@ public:
 	void processQryClosed_TradesTable(Task task);
 	virtual void onQryClosed_TradesTable(boost::python::list data) {};
 
-	void SendOpenRangeOrder(string instrument, string BuyOrSell, int amount, double rateMin, double rateMax, string CustomID);
-	void SendOpenLimitOrder(string instrument, int amount, double rate, string buySell, string customID);
+	void qryOrdersTable();
 };

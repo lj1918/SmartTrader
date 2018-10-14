@@ -54,7 +54,7 @@ if __name__ == '__main__':
     print("=================")
     api.Login(True)
     print("=================")
-    qryResult= pd.DataFrame(api.qryInstrumentInfo())
+    # qryResult= pd.DataFrame(api.qryInstrumentInfo())
     # print(qryResult)
     qryResult = api.qryInstrumentRealtimeInfo("EUR/USD")
     ask = qryResult['Ask']
@@ -62,8 +62,18 @@ if __name__ == '__main__':
     pip = qryResult['PointSize']
     minRate = ask - pip * 10
     maxRate = ask + pip * 10
-    print("beging SendOpenRangeOrder:")
-    api.SendOpenRangeOrder("EUR/USD","B",2, minRate , maxRate ,"mySendOpenRangeOrder")
+    # print("beging SendOpenRangeOrder:")
+    # api.SendOpenLimitOrder("EUR/USD",1000,maxRate,"B","jflsdjflkj")
+    # api.SendCloseLimitOrder("62135966",bid,"ljljlksdf234")
+    # api.SendOpenRangeOrder("EUR/USD","B",3000, minRate , maxRate ,"mySendOpenRangeOrder")
+    # api.SendEntryLimitOrder("EUR/USD",1000,bid,"B","EntryLimitOrder1000")
+    # api.SendEntryStopOrder("EUR/USD",1000,ask,"B","jflkjl")
+    # api.SendDeleteOrder("98887007","lsdjflkjsdf")
+    api.SendCloseAllPositionsByInstrument("EUR/USD")
+    #
+    # print("beging SendOpenMarketOrder:")
+    # api.SendOpenMarketOrder("EUR/USD","1117090","B",1,ask,"lkasjflksjdflk")
+    #
 
     # result = api.qryAccount("1117090")
     # print(result)
@@ -74,8 +84,8 @@ if __name__ == '__main__':
     #                                   8.88,
     #                                   "lj721226")
     # print("result = ",result)
-    # result = api.qryAccount("1117090")
-    # print(result)
+    result = api.qryAccount("1117090")
+    print(result)
     # result = api.qryInstrumentInfo()
     # print(result)
     # print(result['bb'])
