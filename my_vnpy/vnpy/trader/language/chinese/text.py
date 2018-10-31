@@ -138,3 +138,5 @@ DATA_INSERT_FAILED = u'数据插入失败，MongoDB没有连接'
 DATA_QUERY_FAILED = u'数据查询失败，MongoDB没有连接'
 DATA_UPDATE_FAILED = u'数据更新失败，MongoDB没有连接'
 DATA_DELETE_FAILED = u'数据删除失败，MongoDB没有连接'
+
+READ_CONFIGFILE_FAILED = "读取连接配置出错，请检查"

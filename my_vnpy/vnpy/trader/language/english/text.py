@@ -139,3 +139,5 @@ DATA_INSERT_FAILED = u'Data insert failed，please connect MongoDB first.'
 DATA_QUERY_FAILED = u'Data query failed, please connect MongoDB first.'
 DATA_UPDATE_FAILED = u'Data update failed, please connect MongoDB first.'
 DATA_DELETE_FAILED = u'Data delete failed, please connect MongoDB first.'
+
+READ_CONFIGFILE_FAILED = "Reading config file failed, please check it"

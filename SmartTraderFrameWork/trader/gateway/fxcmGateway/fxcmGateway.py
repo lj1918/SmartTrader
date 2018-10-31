@@ -6,4 +6,7 @@ import json
 from copy import copy
 from datetime import datetime,timedelta
 
-from
+from SmartTraderFrameWork
+
+class FxcmGateway(stGateway):
+    pass
