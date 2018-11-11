@@ -42,7 +42,7 @@ long ResponseListener::release()
 /** Request execution completed data handler. 回调函数*/
 void ResponseListener::onRequestCompleted(const char * requestId, IO2GResponse * response = 0)
 {
-	PRINTLINE("response->getType() = " + Tools::GetResponseType(response->getType())  );
+	//PRINTLINE("response->getType() = " + Tools::GetResponseType(response->getType())  );
 	//std::cout << "requestId = " << requestId << std::endl;
 	//是否还有再次查询
 	bool needquestAgain = false;
@@ -270,13 +270,13 @@ void ResponseListener::onRequestFailed(const char * requestId, const char * erro
 void ResponseListener::onTablesUpdates(IO2GResponse * data)
 {
 	O2GResponseType repType = data->getType();
-	PRINTLINE("IO2GResponse type = " + Tools::GetResponseType(data->getType()));
+	//PRINTLINE("IO2GResponse type = " + Tools::GetResponseType(data->getType()));
 	if (data->getType() == O2GResponseType::TablesUpdates)
 	{		
 		//货币对实时报价的订阅消息处理
 		if (repType == O2GResponseType::TablesUpdates)
 		{
-			PRINTLINE("IO2GResponse type = " + Tools::GetResponseType(data->getType()));
+			//PRINTLINE("IO2GResponse type = " + Tools::GetResponseType(data->getType()));
 			O2G2Ptr<IO2GResponseReaderFactory> factory = mSession->getResponseReaderFactory();
 			if (factory)
 			{
@@ -285,7 +285,7 @@ void ResponseListener::onTablesUpdates(IO2GResponse * data)
 				{
 					for (int i = 0; i < reader->size(); i++)
 					{
-						PRINTLINE(Tools::getO2GTableTypeName(reader->getUpdateTable(i)));
+						//PRINTLINE(Tools::getO2GTableTypeName(reader->getUpdateTable(i)));
 						switch (reader->getUpdateTable(i))
 						{
 							//处理Offers表的变化

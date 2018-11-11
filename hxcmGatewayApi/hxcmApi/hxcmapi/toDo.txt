@@ -27,4 +27,6 @@
 13、添加SendEntryStopOrder、SendEntryLimitOrder
 14、添加SendDeleteOrder命令
 15、添加SendEditOrder命令
+16、添加onLogin事件，以及processLogin函数
+17、添加qryTradingSettings函数
 

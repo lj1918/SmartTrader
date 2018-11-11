@@ -169,7 +169,8 @@ public:
 	//==================================================================================	
 	void Login(bool IsBlock = false);
 	void Logout();
-
+	void processLogin(Task task);
+	virtual void onLogin(boost::python::dict data) {}; //
 	//==================================================================================
 	// 历史数据查询
 	//==================================================================================	
@@ -225,6 +226,10 @@ public:
 	boost::python::list qryInstrumentInfo();
 	// 查询货币对的实时信息
 	boost::python::dict qryInstrumentRealtimeInfo(string instrument);
+
+	// 查询货币对交易设置
+	boost::python::dict qryTradingSettings(string instrument);
+
 
 	//==================================================================================
 	// 创建一个Open Order，即指定价格的订单

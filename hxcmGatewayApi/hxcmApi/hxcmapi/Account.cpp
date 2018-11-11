@@ -38,14 +38,12 @@ bool Account::update()
 		O2G2Ptr<IO2GResponseReaderFactory> readerFactory = session->getResponseReaderFactory();
 		O2G2Ptr<IO2GAccountsTableResponseReader>  accountsResponseReader = readerFactory->createAccountsTableReader(response);
 		bool bWasError = false;
-		// 只取第一个账户的信息
-		O2G2Ptr<IO2GAccountRow> accountRow = accountsResponseReader->getRow(0);
+
 		for (int i = 0; i < accountsResponseReader->size(); i++)
 		{
 			O2G2Ptr<IO2GAccountRow> accountRow = accountsResponseReader->getRow(i);
-			if (accountRow)
-			{
-				std::cout << accountRow->getAccountID() << std::endl;
+			if (accountRow )
+			{				
 				if (Account::accountID == accountRow->getAccountID() )
 				{
 					//if ( accountRow->getMarginCallFlag() == "N" 

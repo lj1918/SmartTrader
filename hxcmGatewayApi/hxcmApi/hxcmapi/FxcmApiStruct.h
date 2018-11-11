@@ -18,6 +18,7 @@ using namespace boost;
 #define     OnAccountsTableUpdate_smart					6 //Accounts表更新事件
 #define     OnClosedTradeTableUpdate_smart              7 //ClosedTradeTable表跟新事件
 #define     OnQryClosed_TradesTable_smart				8 // 查询ClosedTradeTable
+#define     OnLogin_smart								9 //登陆事件
 
 struct SFxcmLoginField
 {
@@ -63,6 +64,7 @@ struct Task
 	any task_error;		//错误结构体
 	int task_id;		//请求id
 	bool task_last;		//是否为最后返回
+	int int_data;
 	//char message[1024]  ;
 	
 };

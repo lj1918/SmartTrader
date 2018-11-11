@@ -22,8 +22,8 @@ if __name__ == '__main__':
             pass
 
         def onSubscribeInstrument(self,data):
-        #     #print("call onSubscribeInstrument")
-        #     print(data)
+            print("call onSubscribeInstrument")
+            print(data)
             pass
         def onMessage(self,data):
             # print(type(data))
@@ -50,18 +50,24 @@ if __name__ == '__main__':
         def onQryClosed_TradesTable(self,data):
             print("onQryClosed_TradesTable : ",data)
             pass
+        def onLogin(self,data):
+            # print("onLogin : ", data)
+            if ( data['login_status'] == 3):
+                print("登陆成功！")
+            pass
+        
     api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo","1117090")
     print("=================")
     api.Login(True)
     print("=================")
     # qryResult= pd.DataFrame(api.qryInstrumentInfo())
     # print(qryResult)
-    qryResult = api.qryInstrumentRealtimeInfo("EUR/USD")
-    ask = qryResult['Ask']
-    bid = qryResult['Bid']
-    pip = qryResult['PointSize']
-    minRate = ask - pip * 10
-    maxRate = ask + pip * 10
+    # qryResult = api.qryInstrumentRealtimeInfo("EUR/USD")
+    # ask = qryResult['Ask']
+    # bid = qryResult['Bid']
+    # pip = qryResult['PointSize']
+    # minRate = ask - pip * 10
+    # maxRate = ask + pip * 10
     # print("beging SendOpenRangeOrder:")
     # api.SendOpenLimitOrder("EUR/USD",1000,maxRate,"B","jflsdjflkj")
     # api.SendCloseLimitOrder("62135966",bid,"ljljlksdf234")
@@ -69,7 +75,7 @@ if __name__ == '__main__':
     # api.SendEntryLimitOrder("EUR/USD",1000,bid,"B","EntryLimitOrder1000")
     # api.SendEntryStopOrder("EUR/USD",1000,ask,"B","jflkjl")
     # api.SendDeleteOrder("98887007","lsdjflkjsdf")
-    api.SendCloseAllPositionsByInstrument("EUR/USD")
+    # api.SendCloseAllPositionsByInstrument("EUR/USD")
     #
     # print("beging SendOpenMarketOrder:")
     # api.SendOpenMarketOrder("EUR/USD","1117090","B",1,ask,"lkasjflksjdflk")
@@ -84,8 +90,8 @@ if __name__ == '__main__':
     #                                   8.88,
     #                                   "lj721226")
     # print("result = ",result)
-    result = api.qryAccount("1117090")
-    print(result)
+    # result = api.qryAccount("1117090")
+    # print(result)
     # result = api.qryInstrumentInfo()
     # print(result)
     # print(result['bb'])
@@ -104,13 +110,12 @@ if __name__ == '__main__':
     # print("www www www www ")
     # api.qryLastHisPrice('EUR/USD', 'H1')
     # print(dir(api))
-    # api.Subscribe('EUR/USD','D',False)
+    api.Subscribe('EUR/USD','V',False)
     i = 1
     beginTime = datetime.now()
     #=====================
 
     while(i ):
-        # api.qryHisPrices('EUR/USD', 'm1', 1, '2018-09-05 23:01:17', '2018-09-06 23:01:17')
         time.sleep(1)
         # print(datetime.now(),"=="*30)
         i+=1

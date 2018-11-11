@@ -6,7 +6,7 @@ using namespace std;
 
 //前置声明解决头文件相互包含的问题,这个又必须用头文件，搞不清楚，
 //#include "hxcmapi.h"
-//class HxcmApi;
+class HxcmApi;
 
 class SessionStatusListener : public IO2GSessionStatus
 {
@@ -26,12 +26,11 @@ private:
 	IO2GSession *mSession;
 	/** Event handle. */
 	HANDLE mSessionEvent;
+	HxcmApi * mApi = NULL;
 
 	
 
 public:
-	//
-	//HxcmApi * api = NULL;
 
 	// 通过 IO2GSessionStatus 继承
 	virtual long addRef() override;
@@ -40,8 +39,9 @@ public:
 	virtual void onLoginFailed(const char * error) override;
 
 	//
-	SessionStatusListener(IO2GSession *session,  const char *sessionID, const char *pin)
+	SessionStatusListener(HxcmApi * api,IO2GSession *session,  const char *sessionID, const char *pin)
 	{
+		this->mApi = api;
 		if (sessionID != 0)
 			mSessionID = sessionID;
 		else

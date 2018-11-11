@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SessionStatusListener.h"
+#include "hxcmapi.h"
 using namespace std;
 
 
@@ -18,20 +19,33 @@ long SessionStatusListener::release()
 
 void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 {
-	std::cout <<"status = " << status << std::endl;
+	char c[2];
+	sprintf_s(c, "%d", status);
+	string temp = "onSessionStatusChanged : status = " + string(c) ;
+	Task task = Task();
+	task.task_name = OnLogin_smart;
 	switch (status)
 	{
 	case IO2GSessionStatus::Disconnected:
-		std::cout << "status = IO2GSessionStatus::Disconnected " << status << std::endl;
+	{
 		mConnected = false;
 		mDisconnected = true;
 		//重新链接,以后在实现
 		//this->mSession->login();
 		//发信号，停止等待
 		SetEvent(mSessionEvent);
+		//触发onLogin事件		
+		task.task_data = status;
+		this->mApi->putTask(task);
 		break;
+	}		
 	case IO2GSessionStatus::Connecting:
+	{
+		//触发onLogin事件		
+		task.task_data = status;
+		this->mApi->putTask(task);
 		break;
+	}
 	case IO2GSessionStatus::TradingSessionRequested:
 	{
 		O2G2Ptr<IO2GSessionDescriptorCollection> descriptors = mSession->getTradingSessionDescriptors();
@@ -59,12 +73,18 @@ void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 	}
 	break;
 	case IO2GSessionStatus::Connected:
-		std::cout << "IO2GSessionStatus::Connected" << status << std::endl;
+	{
+		//std::cout << "IO2GSessionStatus::Connected" << status << std::endl;
 		//发信号，停止等待
 		mConnected = true;
 		mDisconnected = false;
 		SetEvent(mSessionEvent);
+		//触发onLogin事件		
+		task.task_data = status;
+		this->mApi->putTask(task);
 		break;
+	}
+		
 	case IO2GSessionStatus::Reconnecting:
 		break;
 	case IO2GSessionStatus::Disconnecting:
@@ -76,6 +96,12 @@ void SessionStatusListener::onSessionStatusChanged(O2GSessionStatus status)
 
 void SessionStatusListener::onLoginFailed(const char * error)
 {
+	//返回LoginFailed原因
+	Task task = Task();
+	task.task_name = OnMessage_smart;
+	task.task_data = string(error);
+	this->mApi->putTask(task);
+	//
 	mError = true;
 }
 /** Wait for connection or error. */
