@@ -18,3 +18,4 @@ EVENT_POSITION = 'ePosition.'           # 持仓回报事件
 EVENT_ACCOUNT = 'eAccount.'             # 账户回报事件
 EVENT_CONTRACT = 'eContract.'           # 合约基础信息回报事件
 EVENT_ERROR = 'eError.'                 # 错误回报事件
+EVENT_OFFER = 'eOffer.'                 # Offer回报事件,即货币对的市场即时报价信息

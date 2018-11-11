@@ -29,4 +29,4 @@
 15、添加SendEditOrder命令
 16、添加onLogin事件，以及processLogin函数
 17、添加qryTradingSettings函数
-
+18、https://www.cnblogs.com/huacw/p/3156684.html 对SetEvent的解释

@@ -77,9 +77,11 @@ class VtGateway(object):
         self.eventEngine.put(event1)
         
         # 特定合约代码的事件
-        event2 = Event(type_=EVENT_ACCOUNT+account.vtAccountID)
+        event2 = Event(type_=EVENT_ACCOUNT + account.AccountID)
         event2.dict_['data'] = account
         self.eventEngine.put(event2)
+
+        print("onAccount : ",account)
     
     #----------------------------------------------------------------------
     def onError(self, error):
@@ -103,8 +105,17 @@ class VtGateway(object):
         # 通用事件
         event1 = Event(type_=EVENT_CONTRACT)
         event1.dict_['data'] = contract
-        self.eventEngine.put(event1)        
-    
+        self.eventEngine.put(event1)
+        print("onContract : ",contract.symbol,contract.OfferID,contract.PointSize,contract.Digits,contract.BaseUnitSize)
+        pass
+    # ----------------------------------------------------------------------
+    def onOffer(self,offer):
+        '''货币对即时报价信息推送'''
+        event1 = Event(type_=EVENT_OFFER)
+        event1.dict_['data'] = offer
+        self.eventEngine.put(event1)
+        # print(offer.Sell,offer.Buy,offer.instrument)
+        pass
     #----------------------------------------------------------------------
     def connect(self):
         """连接"""

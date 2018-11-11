@@ -197,18 +197,24 @@ class VtAccountData(VtBaseData):
         super(VtAccountData, self).__init__()
         
         # 账号代码相关
-        self.accountID = EMPTY_STRING           # 账户代码
+        self.AccountID = EMPTY_STRING           # 账户代码
         self.vtAccountID = EMPTY_STRING         # 账户在vt中的唯一代码，通常是 Gateway名.账户代码
-        
-        # 数值相关
-        self.preBalance = EMPTY_FLOAT           # 昨日账户结算净值
-        self.balance = EMPTY_FLOAT              # 账户净值
-        self.available = EMPTY_FLOAT            # 可用资金
-        self.commission = EMPTY_FLOAT           # 今日手续费
-        self.margin = EMPTY_FLOAT               # 保证金占用
-        self.closeProfit = EMPTY_FLOAT          # 平仓盈亏
-        self.positionProfit = EMPTY_FLOAT       # 持仓盈亏
-        
+        self.AccountKind = EMPTY_STRING         # 账户类型
+        self.AccountName = EMPTY_STRING         # 账户名称
+        self.AmountLimit = EMPTY_INT            # 一单的最大金额
+        self.ATPID       = EMPTY_STRING         #
+        self.Balance     = EMPTY_FLOAT          # 账户净值
+        self.BaseUnitSize = EMPTY_INT           # 一手的大小
+        self.LastMarginCallDate = EMPTY_STRING
+        self.LeverageProfileID  = EMPTY_STRING  # 账户杠杆概况的ID
+        self.M2MEquity          = EMPTY_FLOAT   # 在交易开始日的账户权益余额
+        self.MaintenanceFlag    = False         # 是否处于维护状态
+        self.MaintenanceType    = EMPTY_STRING  # 账户可以进行交易的类型
+        self.ManagerAccountID   = EMPTY_STRING  # 资金经理账户ID
+        self.MarginCallFlag     = EMPTY_STRING  # 补充保证金标记
+        self.NonTradeEquity     = EMPTY_FLOAT   # 在当前交易日应用于账户的会计交易金额
+        return
+
 
 ########################################################################
 class VtErrorData(VtBaseData):
@@ -255,9 +261,27 @@ class VtContractData(VtBaseData):
         self.name = EMPTY_UNICODE               # 合约中文名
         
         self.productClass = EMPTY_UNICODE       # 合约类型
-        self.size = EMPTY_INT                   # 合约大小
         self.priceTick = EMPTY_FLOAT            # 合约最小价格TICK
-        
+
+        self.MaxQuantity = EMPTY_FLOAT          # 一单的最大交易数量
+        self.MinQuantity = EMPTY_FLOAT          # 一单的最小交易数量
+        self.TradingStatus = EMPTY_STRING       # 交易状态，O 可交易，C 不可交易
+        self.Digits        = EMPTY_INT          # 报价小数点位数
+        self.BuyInterest   = EMPTY_FLOAT        # Buy一个最小交易单位的利息
+        self.SellInterest  = EMPTY_FLOAT        #
+        self.PointSize     = EMPTY_INT          # 一个点的大小（the size of one pip）
+        self.SubscriptionStatus = EMPTY_STRING  # 订阅状态
+
+        self.BaseUnitSize       = EMPTY_INT     # 最小交易单位
+        self.CondDistEntryLimit  = EMPTY_INT    # 市场价格与entry limit订单价格的最小价差
+        self.CondDistEntryStop   = EMPTY_INT    # the minimal distance between the rates of the entry limit order and the current market rate
+        self.CondDistLimitForTrade = EMPTY_INT  # the minimal distance between the rates of the limit order for the position and the current market rate.
+        self.CondDistStopForTrade = EMPTY_INT  # the minimal distance between the rates of the limit order for the position and the current market rate.
+
+
+
+
+
         # 期权相关
         self.strikePrice = EMPTY_FLOAT          # 期权行权价
         self.underlyingSymbol = EMPTY_STRING    # 标的物合约代码
@@ -343,5 +367,34 @@ class VtSingleton(type):
             
         return cls._instances[cls]
     
-    
-    
+########################################################################
+class VtOfferData(object):
+    # ----------------------------------------------------------------------
+    def __init__(self):
+        """构造函数"""
+        self.instrument = EMPTY_STRING  # 货币对名称
+        self.Sell = EMPTY_FLOAT  # Ask价格
+        self.Buy = EMPTY_FLOAT  # Bid价格
+
+class VtInstrumentsData(object):
+    def __init__(self):
+        """构造函数"""
+        self.instrument = EMPTY_STRING  # 货币对名称
+        self.OfferID = EMPTY_STRING
+        self.PointSize = EMPTY_INT  # 一个点的大小（the size of one pip）
+        self.Digits = EMPTY_INT  # 报价小数点位数
+        self.BaseUnitSize = EMPTY_INT  # 最小交易单位
+
+        self.MaxQuantity = EMPTY_FLOAT  # 一单的最大交易数量
+        self.MinQuantity = EMPTY_FLOAT  # 一单的最小交易数量
+        self.BuyInterest = EMPTY_FLOAT  # Buy一个最小交易单位的利息
+        self.SellInterest = EMPTY_FLOAT  #
+        self.TradingStatus = EMPTY_STRING  # 交易状态，O 可交易，C 不可交易
+        self.SubscriptionStatus = EMPTY_STRING  # 订阅状态
+
+
+        self.CondDistEntryLimit = EMPTY_INT  # 市场价格与entry limit订单价格的最小价差
+        self.CondDistEntryStop = EMPTY_INT  # the minimal distance between the rates of the entry limit order and the current market rate
+        self.CondDistLimitForTrade = EMPTY_INT  # the minimal distance between the rates of the limit order for the position and the current market rate.
+        self.CondDistStopForTrade = EMPTY_INT  # the minimal distance between the rates of the limit order for the position and the current market rate.
+        return
