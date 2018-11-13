@@ -2,11 +2,9 @@
 #include "stdafx.h"
 #include "FxcmApiStruct.h"
 #include <string>
+#include "hxcmApi.h"
 using namespace std;
 
-//前置声明解决头文件相互包含的问题,这个又必须用头文件，搞不清楚，
-//#include "hxcmapi.h"
-class HxcmApi;
 
 class SessionStatusListener : public IO2GSessionStatus
 {
@@ -22,9 +20,7 @@ private:
 	bool mConnected;
 	/** Flag indicating that connection was ended. */
 	bool mDisconnected;
-	/** Session object. */
-	IO2GSession *mSession;
-	/** Event handle. */
+	IO2GSession* mSession = NULL;
 	HANDLE mSessionEvent;
 	HxcmApi * mApi = NULL;
 

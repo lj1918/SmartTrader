@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "hxcmApiStruct.h"
+#include "FxcmApiStruct.h"
 #include <iostream>
 #include <map>
 using namespace std;

@@ -164,6 +164,7 @@ copy /y   $(TargetDir)*.pyd  D:\SmartTrader\my_vnpy\vnpy\api\fxcm\</Command>
     <ClInclude Include="Account.h" />
     <ClInclude Include="FxcmApiStruct.h" />
     <ClInclude Include="hxcmapi.h" />
+    <ClInclude Include="offerTablelistener.h" />
     <ClInclude Include="ResponseListener.h" />
     <ClInclude Include="SessionStatusListener.h" />
     <ClInclude Include="stdafx.h" />
@@ -175,6 +176,7 @@ copy /y   $(TargetDir)*.pyd  D:\SmartTrader\my_vnpy\vnpy\api\fxcm\</Command>
     <ClCompile Include="Account.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="hxcmapi.cpp" />
+    <ClCompile Include="offerTablelistener.cpp" />
     <ClCompile Include="ResponseListener.cpp" />
     <ClCompile Include="SessionStatusListener.cpp" />
     <ClCompile Include="stdafx.cpp">

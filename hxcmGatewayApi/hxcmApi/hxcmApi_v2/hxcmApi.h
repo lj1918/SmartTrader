@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "hxcmApiStruct.h"
+#include "FxcmApiStruct.h"
 #include "offerTablelistener.h"
 
 //类提前声明，将相应的头文件移到cpp中
@@ -126,7 +126,7 @@ protected:
 	string  PWD;		//
 	string  URL;		//"http://www.fxcorporate.com/Hosts.jsp"
 	string  CONN;		// "Demo" or "Real".
-						//账户ID
+	//账户ID
 	string AccountID;
 
 	void printPrices(IO2GSession *session, IO2GResponse *response);
@@ -244,12 +244,12 @@ public:
 	//==================================================================================
 	//发送市场Order
 	int SendOpenMarketOrder(string symbol,//货币对的名称，例如"EUR/USD"
-		string AccountID,	//账号ID
-		string BuyOrSell,	// B 买，S 卖
-		int	  Amount,
-		//string TimeInForce,	// IOC,FOK
-		double ClientRate,
-		string CustomID
+					   string AccountID,	//账号ID
+					   string BuyOrSell,	// B 买，S 卖
+					   int	  Amount,
+		               //string TimeInForce,	// IOC,FOK
+					   double ClientRate,
+					   string CustomID 
 	);
 
 	// 以市场价格关闭仓位

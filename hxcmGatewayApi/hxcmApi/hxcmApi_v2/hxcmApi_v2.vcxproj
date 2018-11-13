@@ -154,7 +154,7 @@
   <ItemGroup>
     <ClInclude Include="Account.h" />
     <ClInclude Include="hxcmApi.h" />
-    <ClInclude Include="hxcmApiStruct.h" />
+    <ClInclude Include="FxcmApiStruct.h" />
     <ClInclude Include="ResponseListener.h" />
     <ClInclude Include="SessionStatusListener.h" />
     <ClInclude Include="stdafx.h" />

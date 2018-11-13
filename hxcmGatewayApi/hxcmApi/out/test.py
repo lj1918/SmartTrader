@@ -22,7 +22,7 @@ if __name__ == '__main__':
             pass
 
         def onSubscribeInstrument(self,data):
-            print("call onSubscribeInstrument")
+            print("onSubscribeInstrument : ")
             print(data)
             pass
         def onMessage(self,data):
@@ -55,7 +55,12 @@ if __name__ == '__main__':
             if ( data['login_status'] == 3):
                 print("登陆成功！")
             pass
-        
+        def onOfferUpdate(self,data):
+            print("onOfferUpdate : ", data)
+            pass
+
+
+    print("=================")
     api = test("701037785","4616", "http://www.fxcorporate.com/Hosts.jsp","demo","1117090")
     print("=================")
     api.Login(True)

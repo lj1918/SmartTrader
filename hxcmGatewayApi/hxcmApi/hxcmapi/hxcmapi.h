@@ -1,10 +1,17 @@
 #pragma once
 #include "stdafx.h"
 #include "FxcmApiStruct.h"
+#include "offerTablelistener.h"
 
 //类提前声明，将相应的头文件移到cpp中
+/*
+在编写C++程序的时候，偶尔需要用到前置声明(Forward declaration)。
+因为类A中用到了类B，而类B的声明出现在类A的后面。如果没有类B的前置说明，
+下面的程序将不同通过编译，编译器将会给出类似“缺少类型说明符”这样的出错提示。
+*/
 class SessionStatusListener;
 class ResponseListener;
+class OfferTableListener;
 
 //命名空间
 using namespace std;
@@ -110,9 +117,7 @@ protected:
 	IO2GSession * pSession = NULL;
 	SessionStatusListener *pSessionStatusListener = NULL;
 	ResponseListener *pResponseListener = NULL;
-	// 尽可能不用该变量
-	//IO2GRequestFactory * mRequestFactory = NULL; 
-
+	OfferTableListener * mOfferTableListener = NULL;
 	bool bConnected = false;
 
 	//3. 链接参数
@@ -133,11 +138,12 @@ protected:
 	std::map<string, boost::thread*> TickThread;
 
 public:
+	//构造函数
 	HxcmApi();
 	HxcmApi(string  userName, string   pwd, string  url, string connection,string accounntid);
 
 	//析构函数
-	~HxcmApi() {};
+	~HxcmApi();
 
 	//==================================================================================
 	//功能函数，或辅助函数
@@ -294,4 +300,9 @@ public:
 	void qryClosed_TradesTable();
 	void processQryClosed_TradesTable(Task task);
 	virtual void onQryClosed_TradesTable(boost::python::list data) {};
+
+	//处理offerTable的update信息
+	void processOfferTableUpdate(Task task);
+	virtual void onOfferUpdate(boost::python::dict data) {};
+
 };

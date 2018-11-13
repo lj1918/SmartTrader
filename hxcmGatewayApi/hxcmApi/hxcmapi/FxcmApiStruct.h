@@ -19,6 +19,7 @@ using namespace boost;
 #define     OnClosedTradeTableUpdate_smart              7 //ClosedTradeTable表跟新事件
 #define     OnQryClosed_TradesTable_smart				8 // 查询ClosedTradeTable
 #define     OnLogin_smart								9 //登陆事件
+#define     OnGetOffer_smart							10 //Get offer事件
 
 struct SFxcmLoginField
 {

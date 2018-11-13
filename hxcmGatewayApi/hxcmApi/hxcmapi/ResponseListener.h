@@ -31,13 +31,14 @@ private:
 	
 
 protected:
-	virtual ~ResponseListener();
+
 public:
 	//数据
 	map<string, sFxcmRequestData> mRequestDataSet;
 
 	//方法
 	ResponseListener(IO2GSession *session, HxcmApi * api/**/);
+	~ResponseListener();
 	// 通过 IO2GResponseListener 继承
 	virtual long addRef() override;
 	virtual long release() override;
